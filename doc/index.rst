@@ -6,6 +6,8 @@
 Welcome to PolicyPad's documentation!
 =====================================
 
+Test text
+
 Contents:
 
 .. toctree::
