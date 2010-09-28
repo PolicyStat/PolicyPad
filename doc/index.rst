@@ -6,7 +6,7 @@
 Welcome to PolicyPad's documentation!
 =====================================
 
-It works!
+Please work
 
 Contents:
 
