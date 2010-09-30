@@ -3,5 +3,5 @@ doc: clean
 	./build.sh
 
 clean:
-	rm *.svg
+	rm -f *.svg
 
