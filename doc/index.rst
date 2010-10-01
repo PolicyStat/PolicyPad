@@ -11,6 +11,9 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   use-cases
+   dfd
+
 Indices and tables
 ==================
 
