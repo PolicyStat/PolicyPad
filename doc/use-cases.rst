@@ -351,3 +351,44 @@ Hyperlink
 +---------------------+----------------------------------------------------------+
 | **Alternate Flow**  | 1. User cancels operation and closes dialog box          |
 +---------------------+----------------------------------------------------------+
+
+Collaborative Edit
+^^^^^^^^^^^^^^^^^^
++---------------------+----------------------------------------------------------+
+| **Description**     | Users edit document concurrently                         |
++---------------------+----------------------------------------------------------+
+| **Actors**          | Multiple Users                                           |
++---------------------+----------------------------------------------------------+
+| **Pre-Conditions**  | Users are logged in and have a document open.            |
++---------------------+----------------------------------------------------------+
+| **Post-Conditions** | All users see edit made to document.                     |
++---------------------+----------------------------------------------------------+
+| **Basic Flow**      | 1. User makes an edit to a document [Alt. Flow]          |
+|                     | 2. System records change and sends out message to all    |
+|                     |     all clients                                          |
+|                     | 3. All users' browsers update display to reflect change  |
++---------------------+----------------------------------------------------------+
+| **Alternate Flow**  | 1. Two users make an edit at the exact same time         |
+|                     | 2. User edits are recorded and displayed on First Come,  |
+|                     |     First Serve basis.                                   |
++---------------------+----------------------------------------------------------+
+
+Collaborative Chat Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
++---------------------+----------------------------------------------------------+
+| **Description**     | User initiates chat amongst users editing document       |
++---------------------+----------------------------------------------------------+
+| **Actors**          | Multiple Users                                           |
++---------------------+----------------------------------------------------------+
+| **Pre-Conditions**  | Users are logged in and have a document open.            |
++---------------------+----------------------------------------------------------+
+| **Post-Conditions** | All users see chat in real-time.                         |
++---------------------+----------------------------------------------------------+
+| **Basic Flow**      | 1. User clicks button to open chat window                |
+|                     | 2. User sees a window of all people currently            |
+|                     |      editing document [Alt. Flow]                        |
+|                     | 3. User may type chat messages into window               |
++---------------------+----------------------------------------------------------+
+| **Alternate Flow**  | 1. User closes chat window                               |
++---------------------+----------------------------------------------------------+
+
