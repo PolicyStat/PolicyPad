@@ -36,13 +36,13 @@ Use-Case Mapping
 | (A non-functional requirement         |                                         |
 | feature)                              |                                         |
 +---------------------------------------+-----------------------------------------+
-| Changes should be made via a          | "Tables",                                |
-| WYMEditor that hides the actual HTML  | "Insert Table Row",                      |
+| Changes should be made via a          | "Tables",                               |
+| WYMEditor that hides the actual HTML  | "Insert Table Row",                     |
 | being edited from the user.           | "Insert Table Column",                  |
-|                                       | "Strong Emphasis",                       |
-|                                       | "Bold",                                  |
-|                                       | "Undo",                                  |
-|                                       | "Redo",                                  |
+|                                       | "Strong Emphasis",                      |
+|                                       | "Bold",                                 |
+|                                       | "Undo",                                 |
+|                                       | "Redo",                                 |
 |                                       | "Hyperlink"                             |
 +---------------------------------------+-----------------------------------------+
 | Ability to view the current revision  | "View Prior Change"                     |
