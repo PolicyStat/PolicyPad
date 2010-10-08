@@ -60,7 +60,7 @@ Creating a New Document
 |                     | 2. The system generates a new document with a unique URL |
 |                     | 3. The system redirects the user to the new URL          |
 +---------------------+----------------------------------------------------------+
-| **Alternate Flow**  | None
+| **Alternate Flow**  | None                                                     |
 +---------------------+----------------------------------------------------------+
 
 View Prior Change
@@ -75,9 +75,10 @@ View Prior Change
 | **Post-Conditions** | User's browser displays prior changes made, if any       |
 +---------------------+----------------------------------------------------------+
 | **Basic Flow**      | 1. User clicks on button in interface                    |
-|                     | 2. Opens a new window containing a revision log          |
+|                     | 2. Opens a new window containing a revisions [Alt. Flow] |
 +---------------------+----------------------------------------------------------+
 | **Alternate Flow**  | 1. No prior changes exist                                |
+|                     | 2. System returns to state before user click             |
 +---------------------+----------------------------------------------------------+
 
 Bad URL
@@ -96,11 +97,12 @@ Bad URL
 | **Basic Flow**      | 1. System informs user that document does not exist      |
 |                     | 2. System gives user option to create new document with  |
 |                     |    invalid portion of url as name                        |
-|                     | 3. User chooses Yes                                      |
+|                     | 3. User chooses Yes [Alt. Flow]                          |
 |                     | 4. Follow steps for creating a new document, fill in     |
 |                     |    name with suffix of bad url                           |
 +---------------------+----------------------------------------------------------+
-| **Alternate Flow**  | 1. Document does not exist (404 not found)               |
+| **Alternate Flow**  | 1. User chooses No                                       |
+|                     | 2. Browser navigates back to the page before the bad url |
 +---------------------+----------------------------------------------------------+
 
 Valid URL
@@ -142,12 +144,12 @@ Ordered List (Nestable)
 |                     | 3. User enters an item into the list as if it were       |
 |                     |    normal editing space                                  |
 |                     | 4. When user presses enter, system presents space for    |
-|                     |    the next item                                         |
+|                     |    the next item [Alt. Flow]                             |
 |                     | 5. When user wishes to end the list context, he/she hits |
 |                     |    backspace                                             |
 |                     | 6. System returns to normal editing space                |
 +---------------------+----------------------------------------------------------+
-| **Alternate Flow**  | None                                                     |
+| **Alternate Flow**  | 1. User cancels sequence making operation                |
 +---------------------+----------------------------------------------------------+
 
 Tables
@@ -166,7 +168,7 @@ Tables
 +---------------------+----------------------------------------------------------+
 | **Basic Flow**      | 1. User pushes a button for creating a table             |
 |                     | 2. System prompts user for basic table size (rows,       |
-|                     |    columns)                                              |
+|                     |    columns) [Alt. Flow]                                  |
 |                     | 3. Table appears in document with cursor inside first    |
 |                     |    cell                                                  |
 |                     | 4. User fills in information a cell at a time, tabbing   |
@@ -174,7 +176,8 @@ Tables
 |                     | 5. User clicks outside of table to continue editing      |
 |                     |    normally                                              |
 +---------------------+----------------------------------------------------------+
-| **Alternate Flow**  | None                                                     |
+| **Alternate Flow**  | 1. User cancels operation                                |
+|                     | 2. User is returned from dialog box to opened document   |
 +---------------------+----------------------------------------------------------+
 
 
@@ -239,7 +242,7 @@ Strong Emphasis
 +---------------------+----------------------------------------------------------+
 | **Post-Conditions** | User has the selected text in strong emphasis.           |
 +---------------------+----------------------------------------------------------+
-| **Basic Flow**      | 1. User highlights a piece of text.                      |
+| **Basic Flow**      | 1. User highlights a piece of text. [Alt. Flow]          |
 |                     | 2. User clicks on the "strong emphasis" button.          |
 |                     | 3. System checks if piece of text is strong emphasized.  |
 |                     | 4. (Conditional)                                         |
@@ -268,7 +271,7 @@ Bold
 +---------------------+----------------------------------------------------------+
 | **Post-Conditions** | User has the selected text bolded.                       |
 +---------------------+----------------------------------------------------------+
-| **Basic Flow**      | 1. User highlights a piece of text.                      |
+| **Basic Flow**      | 1. User highlights a piece of text. [Alt. Flow]          |
 |                     | 2. User clicks on the "bold" button.                     |
 |                     | 3. System checks if piece of text is bold.               |
 |                     | 4. (Conditional)                                         |
@@ -297,15 +300,12 @@ Undo
 | **Basic Flow**      | 1. User hits the undo button.                            |
 |                     | 2. The system checks to see if there is an action that   |
 |                     |    can be undone.                                        |
-|                     | 3. (Conditional)                                         |
-|                     |   a. If there is an action that can be undone, the       |
-|                     |      system undoes the most previous action and displays |
-|                     |      the document in that state.                         |
-|                     |   b. If there are no more actions that can be undone,    |
-|                     |      the system displays a message and the document in   |
-|                     |      the current state.                                  |
+|                     | 3. The system undoes the most previous action and        |
+|                     |      displays the document in that state. [Alt. Flow]    |
 +---------------------+----------------------------------------------------------+
-| **Alternate Flow**  | None                                                     |
+| **Alternate Flow**  | 1. There are no more actions that can be undone.         |
+|                     | 2. System displays a message that nothing can be undone. |
+|                     | 3. Document is left in the state before the undo button  |
 +---------------------+----------------------------------------------------------+
 
 
@@ -323,15 +323,12 @@ Redo
 | **Basic Flow**      | 1. User hits the redo button.                            |
 |                     | 2. The system checks to see if there is an action that   |
 |                     |    can be redone.                                        |
-|                     | 3. (Conditional)                                         |
-|                     |  a. If there is an action that can be redone, the        |
-|                     |     system redoes the most previous action and displays  |
-|                     |     the document in that state.                          |
-|                     |  b. If there are no more actions that can be redone, the |
-|                     |     system displays a message and the document in the    |
-|                     |     current state.                                       |
+|                     | 3. The system redoes the most previous action [Alt. Flow]|
+|                     | 4. System displays changed document                      |
 +---------------------+----------------------------------------------------------+
-| **Alternate Flow**  | None                                                     |
+| **Alternate Flow**  | 1. There are no more actions that can be redone          |
+|                     | 2. System displays a message that nothing can be redone  |
+|                     | 3. Document is left in the state before the redo button  |
 +---------------------+----------------------------------------------------------+
 
 Hyperlink
@@ -348,7 +345,7 @@ Hyperlink
 | **Basic Flow**      | 1. User highlights a piece of text.                      |
 |                     | 2. User clicks on the "hyperlink" button.                |
 |                     | 3. System presents user with dialog box.                 |
-|                     | 4. User enters URL path, and title [alt. 1]              |
+|                     | 4. User enters URL path, and title [Alt. Flow]           |
 |                     | 5. User clicks submit                                    |
 |                     | 6. System inserts hyperlink in document at cursor        |
 +---------------------+----------------------------------------------------------+
