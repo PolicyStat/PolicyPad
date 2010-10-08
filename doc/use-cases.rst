@@ -20,7 +20,7 @@ Server Unreachable
 | **Basic Flow**      | 1. System informs user that server could not be reached  |
 |                     | 2. System suggests that user check to see that they are  |
 |                     |    connected to the internet                             |
-|					  | 3. System returns to state before request initiated      |
+|                     | 3. System returns to state before request initiated      |
 +---------------------+----------------------------------------------------------+
 
 Server Timeout
@@ -38,7 +38,7 @@ Server Timeout
 | **Basic Flow**      | 1. System informs user that it cannot reach the server   |
 |                     | 2. System kindly requests that user try the action again |
 |                     |    later                                                 |
-|					  | 3. System returns to state before request initiated      |
+|                     | 3. System returns to state before request initiated      |
 +---------------------+----------------------------------------------------------+
 
 
@@ -337,9 +337,9 @@ Redo
 Hyperlink
 ^^^^^^^^^
 +---------------------+----------------------------------------------------------+
-| **Description**	  | User creates hyperlink in document.						 |
+| **Description**     | User creates hyperlink in document.                      |
 +---------------------+----------------------------------------------------------+
-| **Actors**		  | User													 |
+| **Actors**          | User                                                     |
 +---------------------+----------------------------------------------------------+
 | **Pre-Conditions**  | User is logged in and has a document open.               |
 +---------------------+----------------------------------------------------------+
@@ -347,10 +347,10 @@ Hyperlink
 +---------------------+----------------------------------------------------------+
 | **Basic Flow**      | 1. User highlights a piece of text.                      |
 |                     | 2. User clicks on the "hyperlink" button.                |
-|                     | 3. System presents user with dialog box.				 |
-|					  | 4. User enters URL path, and title [alt. 1]				 |
-|					  | 5. User clicks submit									 |
-|					  | 6. System inserts hyperlink in document at cursor		 |
+|                     | 3. System presents user with dialog box.                 |
+|                     | 4. User enters URL path, and title [alt. 1]              |
+|                     | 5. User clicks submit                                    |
+|                     | 6. System inserts hyperlink in document at cursor        |
 +---------------------+----------------------------------------------------------+
-| **Alternate Flow**  | 1. User cancels operation and closes dialog box			 |
+| **Alternate Flow**  | 1. User cancels operation and closes dialog box          |
 +---------------------+----------------------------------------------------------+
