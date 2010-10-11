@@ -246,6 +246,7 @@ Strong Emphasis
 |                     | 2. User clicks on the "strong emphasis" button.          |
 |                     | 3. System checks if piece of text is strong emphasized.  |
 |                     | 4. (Conditional)                                         |
+|                     |                                                          |
 |                     |   a. If text is completely strong emphasized, do         |
 |                     |      nothing.                                            |
 |                     |   b. If text is partially or not strong emphasized at    |
@@ -275,6 +276,7 @@ Bold
 |                     | 2. User clicks on the "bold" button.                     |
 |                     | 3. System checks if piece of text is bold.               |
 |                     | 4. (Conditional)                                         |
+|                     |                                                          |
 |                     |   a. If text is completely bolded, do nothing.           |
 |                     |   b. If text is partially or not bolded at all, convert  |
 |                     |      all highlighted text to bold.                       |
