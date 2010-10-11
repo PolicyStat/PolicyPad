@@ -14,6 +14,7 @@ Contents:
    features
    use-cases
    dfd
+   changesets
 
 Indices and tables
 ==================
