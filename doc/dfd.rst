@@ -8,6 +8,7 @@ Context Level
 After first defining the context level data flow diagram, every process is broken down into successive levels.  For each sub-level diagram, the context level entry being broken down is first shown for context.  Each successive level of flow is then displayed below the prior level of flow, presenting a deeper layer of context than the actions above it.
 
 There are two primary data sources represented: Document DB and Web Session.  Document DB refers to the supporting database and contains all relevant permanent document storage.  Web Session deals with more volatile session data.  This type of data source is necessary for this project as its primary use involves real time interaction through a concept of a session.  Examples of information included in this data source is a listing of who is currently viewing a particular document so that they can be notified when changes are made.  All data stored in the web session is transient, and does not need to be stored in any sort of robust way.
+
 .. image:: _static/proposed.png
 
 Document Creation
