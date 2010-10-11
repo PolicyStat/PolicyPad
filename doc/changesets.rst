@@ -34,10 +34,10 @@ This changeset, together with the pool, represents inserting
 a bold letter "x" into the middle of a line. The string consists of:
 
 * a letter Z (the "magic character" and format version identifier)
-- a series of opcodes (punctuation) and numeric values in base 36 (the
+* a series of opcodes (punctuation) and numeric values in base 36 (the
   alphanumerics)
-- a dollar sign ($)
-- a string of characters used by insertion operations (the "char bank")
+* a dollar sign ($)
+* a string of characters used by insertion operations (the "char bank")
 
 Operations
 ----------
