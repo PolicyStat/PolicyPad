@@ -135,27 +135,24 @@ Ordered List (Nestable)
 +---------------------+----------------------------------------------------------+
 | **Actors**          | User                                                     |
 +---------------------+----------------------------------------------------------+
-| **Pre-Conditions**  | * User must have document open, and have writing         |
-|                     |   permission.                                            |
-|                     | * User must have cursor in the position where user       |
-|                     |   wants to add list (may be inside another list).        |
+| **Pre-Conditions**  | User must have cursor in the position where user         |
+|                     | wants to add list (may be inside another list).          |
 +---------------------+----------------------------------------------------------+
 | **Post-Conditions** | List containing entered information is shown.            |
 +---------------------+----------------------------------------------------------+
 | **Basic Flow**      | 1. User pushes button that indicates that user wants to  |
 |                     |    begin creating a list.                                |
-|                     | 2. System shows some graphical indication that user is   |
-|                     |    now in a "list-making environment" (such as           |
-|                     |    indentation, or bullet point, or number).             |
+|                     | 2. Each line the user enters is not prefaced by a number |
+|                     |    starting at one and counting up.                      |
 |                     | 3. User enters an item into the list as if it were       |
 |                     |    normal editing space.                                 |
 |                     | 4. When user presses enter, system presents space for    |
-|                     |    the next item. [Alt. Flow]                            |
-|                     | 5. When user wishes to end the list context, he/she hits |
-|                     |    backspace.                                            |
+|                     |    the next item.                                        |
+|                     | 5. When user wishes to end the list context, he/she      |
+|                     |    presses the enter key twice.                          |
 |                     | 6. System returns to normal editing space.               |
 +---------------------+----------------------------------------------------------+
-| **Alternate Flow**  | 1. User cancels sequence making operation                |
+| **Alternate Flow**  | None                                                     |
 +---------------------+----------------------------------------------------------+
 
 Tables
