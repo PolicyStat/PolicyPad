@@ -1,0 +1,51 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+WYMeditor.INIT_DIALOG	jquery.wymeditor.js	/^WYMeditor.INIT_DIALOG = function(index) {$/;"	f
+WYMeditor.XmlHelper	jquery.wymeditor.js	/^WYMeditor.XmlHelper = function()$/;"	c
+WYMeditor.XmlHelper._fixDoubleEscape	jquery.wymeditor.js	/^WYMeditor.XmlHelper.prototype._fixDoubleEscape = function(escaped)$/;"	m
+WYMeditor.XmlHelper.cdataSection	jquery.wymeditor.js	/^WYMeditor.XmlHelper.prototype.cdataSection = function(content)$/;"	m
+WYMeditor.XmlHelper.contentTag	jquery.wymeditor.js	/^WYMeditor.XmlHelper.prototype.contentTag = function(name, content, options)$/;"	m
+WYMeditor.XmlHelper.escapeEntities	jquery.wymeditor.js	/^WYMeditor.XmlHelper.prototype.escapeEntities = function(string, escape_quotes)$/;"	m
+WYMeditor.XmlHelper.escapeOnce	jquery.wymeditor.js	/^WYMeditor.XmlHelper.prototype.escapeOnce = function(xml)$/;"	m
+WYMeditor.XmlHelper.parseAttributes	jquery.wymeditor.js	/^WYMeditor.XmlHelper.prototype.parseAttributes = function(tag_attributes)$/;"	m
+WYMeditor.XmlHelper.tag	jquery.wymeditor.js	/^WYMeditor.XmlHelper.prototype.tag = function(name, options, open)$/;"	m
+WYMeditor.XmlHelper.tagOptions	jquery.wymeditor.js	/^WYMeditor.XmlHelper.prototype.tagOptions = function(options)$/;"	m
+WYMeditor.console	jquery.wymeditor.js	/^            WYMeditor.console[names[i]] = function() {}$/;"	f
+WYMeditor.editor	jquery.wymeditor.js	/^WYMeditor.editor.prototype.init = function() {$/;"	c
+WYMeditor.editor.addCssRules	jquery.wymeditor.js	/^WYMeditor.editor.prototype.addCssRules = function(doc, aCss) {$/;"	m
+WYMeditor.editor.bindEvents	jquery.wymeditor.js	/^WYMeditor.editor.prototype.bindEvents = function() {$/;"	m
+WYMeditor.editor.box	jquery.wymeditor.js	/^WYMeditor.editor.prototype.box = function() {$/;"	m
+WYMeditor.editor.computeBasePath	jquery.wymeditor.js	/^WYMeditor.editor.prototype.computeBasePath = function() {$/;"	m
+WYMeditor.editor.computeCssPath	jquery.wymeditor.js	/^WYMeditor.editor.prototype.computeCssPath = function() {$/;"	m
+WYMeditor.editor.computeJqueryPath	jquery.wymeditor.js	/^WYMeditor.editor.prototype.computeJqueryPath = function() {$/;"	m
+WYMeditor.editor.computeWymPath	jquery.wymeditor.js	/^WYMeditor.editor.prototype.computeWymPath = function() {$/;"	m
+WYMeditor.editor.configureEditorUsingRawCss	jquery.wymeditor.js	/^WYMeditor.editor.prototype.configureEditorUsingRawCss = function() {$/;"	m
+WYMeditor.editor.container	jquery.wymeditor.js	/^WYMeditor.editor.prototype.container = function(sType) {$/;"	m
+WYMeditor.editor.dialog	jquery.wymeditor.js	/^WYMeditor.editor.prototype.dialog = function( dialogType, dialogFeatures, bodyHtml ) {$/;"	m
+WYMeditor.editor.encloseString	jquery.wymeditor.js	/^WYMeditor.editor.prototype.encloseString = function(sVal) {$/;"	m
+WYMeditor.editor.exec	jquery.wymeditor.js	/^WYMeditor.editor.prototype.exec = function(cmd) {$/;"	m
+WYMeditor.editor.findUp	jquery.wymeditor.js	/^WYMeditor.editor.prototype.findUp = function(node, filter) {$/;"	m
+WYMeditor.editor.html	jquery.wymeditor.js	/^WYMeditor.editor.prototype.html = function(html) {$/;"	m
+WYMeditor.editor.init	jquery.wymeditor.js	/^WYMeditor.editor.prototype.init = function() {$/;"	m
+WYMeditor.editor.insert	jquery.wymeditor.js	/^WYMeditor.editor.prototype.insert = function(html) {$/;"	m
+WYMeditor.editor.listen	jquery.wymeditor.js	/^WYMeditor.editor.prototype.listen = function() {$/;"	m
+WYMeditor.editor.loadSkin	jquery.wymeditor.js	/^WYMeditor.editor.prototype.loadSkin = function() {$/;"	m
+WYMeditor.editor.mousedown	jquery.wymeditor.js	/^WYMeditor.editor.prototype.mousedown = function(evt) {$/;"	m
+WYMeditor.editor.paste	jquery.wymeditor.js	/^WYMeditor.editor.prototype.paste = function(sData) {$/;"	m
+WYMeditor.editor.ready	jquery.wymeditor.js	/^WYMeditor.editor.prototype.ready = function() {$/;"	m
+WYMeditor.editor.replaceStrings	jquery.wymeditor.js	/^WYMeditor.editor.prototype.replaceStrings = function(sVal) {$/;"	m
+WYMeditor.editor.setFocusToNode	jquery.wymeditor.js	/^WYMeditor.editor.prototype.setFocusToNode = function(node, toStart) {$/;"	m
+WYMeditor.editor.status	jquery.wymeditor.js	/^WYMeditor.editor.prototype.status = function(sMessage) {$/;"	m
+WYMeditor.editor.switchTo	jquery.wymeditor.js	/^WYMeditor.editor.prototype.switchTo = function(node,sType) {$/;"	m
+WYMeditor.editor.toggleClass	jquery.wymeditor.js	/^WYMeditor.editor.prototype.toggleClass = function(sClass, jqexpr) {$/;"	m
+WYMeditor.editor.toggleHtml	jquery.wymeditor.js	/^WYMeditor.editor.prototype.toggleHtml = function() {$/;"	m
+WYMeditor.editor.uniqueStamp	jquery.wymeditor.js	/^WYMeditor.editor.prototype.uniqueStamp = function() {$/;"	m
+WYMeditor.editor.unwrap	jquery.wymeditor.js	/^WYMeditor.editor.prototype.unwrap = function() {$/;"	m
+WYMeditor.editor.update	jquery.wymeditor.js	/^WYMeditor.editor.prototype.update = function() {$/;"	m
+WYMeditor.editor.xhtml	jquery.wymeditor.js	/^WYMeditor.editor.prototype.xhtml = function() {$/;"	m
+WYMeditor.loadCss	jquery.wymeditor.js	/^WYMeditor.loadCss = function(href) {$/;"	f
+jQuery.fn.wymeditor	jquery.wymeditor.js	/^jQuery.fn.wymeditor = function(options) {$/;"	f

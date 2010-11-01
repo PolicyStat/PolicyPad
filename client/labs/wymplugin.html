@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!--
+ * WYMeditor : what you see is What You Mean web-based editor
+ * Copyright (c) 2005 - 2009 Jean-Francois Hovinne, http://www.wymeditor.org/
+ * Dual licensed under the MIT (MIT-license.txt)
+ * and GPL (GPL-license.txt) licenses.
+ *
+ * For further information visit:
+ *        http://www.wymeditor.org/
+ *
+ * File Name:
+ *        01-basic.html
+ *        WYMeditor integration example.
+ *        See the documentation for more info.
+ *
+ * File Authors:
+ *        Jean-Francois Hovinne - http://www.hovinne.com/
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>WYMeditor</title>
+<!-- jQuery library is required, see http://jquery.com/ -->
+<script type="text/javascript" src="wymeditor/jquery/jquery.js"></script>
+<!-- WYMeditor main JS file, minified version -->
+<script type="text/javascript" src="wymeditor/wymeditor/jquery.wymeditor.js"></script>
+<script type="text/javascript" src="wymplugin.js"></script>
+
+<script type="text/javascript">
+
+/* Here we replace each element with class 'wymeditor'
+ * (typically textareas) by a WYMeditor instance.
+ * 
+ * We could use the 'html' option, to initialize the editor's content.
+ * If this option isn't set, the content is retrieved from
+ * the element being replaced.
+ */
+
+var initialHtml = '<p><b>Heading</b></p><p>Hello world!</p>';
+
+jQuery(function() {
+    jQuery('.wymeditor').wymeditor({
+            html: initialHtml,
+            postInit: function(wym) {
+                    //activate wymplugin
+                    wym.wymplugin();
+            }
+    });
+});
+
+//debugging
+var wym = jQuery.wymeditors(0);
+
+function getLengthToNode(base, child) {
+    return child.parentNode.offsetLeft - base.offsetLeft;
+}
+
+function getCursor() {
+    //there has to be a better way to determine the 
+    //cursor position
+    var wym = jQuery.wymeditors(0);
+    sel = wym._iframe.contentWindow.getSelection();
+    rng = sel.getRangeAt(0);
+    body = rng.startContainer.ownerDocument.body;
+    return rng.startOffset + getLengthToNode(body, rng.startContainer);
+}
+
+function getSelection() {
+    //FIXME: this function is currently broken in
+    //that it returns the start offsets relative
+    //to the selections node, not relative to the
+    //text area's body tag.  Some assumption about
+    //how the html is converted must be made for
+    //this to work.
+    var wym = jQuery.wymeditors(0);
+    sel = wym._iframe.contentWindow.getSelection();
+    res = new Array(sel.rangeCount);
+    for (i = 0; i < sel.rangeCount; i += 1) {
+        range = sel.getRangeAt(i);
+        res[i] = range.startOffset, range.endOffset;
+    }
+    return res;
+}
+
+function update() {
+    var wym = jQuery.wymeditors(0);
+    var txtDoc = $('#txtDoc');
+    var txtLog = $('#txtLog');
+    var txtPos = $('#txtPos');
+
+    var newhtml = wym.html();
+    var oldhtml = txtDoc.val();
+
+    if (newhtml == oldhtml) {
+        msg = "No change";
+    } else {
+        msg = "Changeset here";
+    }
+    txtLog.val(msg + "\n" + txtLog.val());
+
+    txtDoc.val(newhtml);
+    //alert("Html: " + html);
+
+    //cursor positioning
+    pos = getCursor(); //getSelection();
+    //txtPos.val(JSON.stringify(pos));
+    txtPos.val(pos);
+}
+
+function initialize() {
+    $('#txtDoc').val(initialHtml);
+}
+
+function btnRefresh_onclick() {
+        update();
+}
+
+
+
+</script>
+
+
+</head>
+
+<body onload="initialize();">
+<h1>WYMeditor integration example</h1>
+<p><a href="http://www.wymeditor.org/">WYMeditor</a> is a web-based XHTML WYSIWYM editor.</p>
+<form method="post" action="">
+<textarea class="wymeditor">&lt;p&gt;Hello, World!&lt;/p&gt;</textarea>
+<input type="submit" class="wymupdate" />
+</form>
+
+<form>
+Cursor Position: <textarea id="txtPos" rows="1" cols="40">Cursor position here</textarea> <br />
+Current HTML: <textarea id="txtDoc" rows="4" cols="80">HTML will go here</textarea> <br />
+Changes:<textarea id="txtLog" rows="10" cols="80"></textarea> <br />
+<input type="button" name="btnRefresh" value="Refresh" onclick="btnRefresh_onclick();" />
+</form>
+
+</body>
+</html>
