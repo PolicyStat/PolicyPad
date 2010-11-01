@@ -76,7 +76,9 @@ function update() {
     var oldhtml = docCur.text();
 
     msg = generateChangeset(oldhtml, newhtml);
-    changes.prepend(msg + "<br />");
+
+    $('<div></div>').text(msg).prependTo(changes)
+    //changes.prepend(msg + "<br />");
 
     docCur.text(newhtml);
     docPrev.text(oldhtml);
