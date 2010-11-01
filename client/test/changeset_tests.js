@@ -47,10 +47,10 @@ test('single character append', function() {
  * Old: foobaz
  * New: foobarbaz
  *
- * Expected: Z:6>3=3+3$bar
+ * Expected: Z:6>3=5+3=1$rba
  */
 test('simple single line insert', function() {
-    equals(generateChangeset('foobaz', 'foobarbaz'), 'Z:6>3=3+3$bar');
+    equals(generateChangeset('foobaz', 'foobarbaz'), 'Z:6>3=5+3=1$rba');
 });
 
 
@@ -69,10 +69,10 @@ test('simple multi line append', function() {
  * Old: foo\nbar
  * New: foo\nbar\nbaz
  *
- * Expected: Z:7>4|1=4=3+4$\nbaz
+ * Expected: Z:7>4|1=4=3|1+1+3$\nbaz
  */
 test('simple multi line append without original newline', function() {
-    equals(generateChangeset('foo\nbar', 'foo\nbar\nbaz'), 'Z:7>4|1=4=3+4$\nbaz');
+    equals(generateChangeset('foo\nbar', 'foo\nbar\nbaz'), 'Z:7>4|1=4=3|1+1+3$\nbaz');
 });
 
 
@@ -83,7 +83,7 @@ test('simple multi line append without original newline', function() {
  * Expected: Z:7>4|1=4+4$bar\n
  */
 test('simple multi line insert', function() {
-    equals(generateChangeset('foo\nbaz', 'foo\nbar\nbaz'), 'Z:7>4|1=4+4$bar\n');
+    equals(generateChangeset('foo\nbaz', 'foo\nbar\nbaz'), 'Z:7>4|1=4=2|1+2+2=1$r\nba');
 });
 
 
@@ -108,8 +108,8 @@ test('simple single character delete', function() {
  * Old: foobarbaz
  * New: foobaz
  *
- * Expected: Z:6<3=3-3
+ * Expected: Z:9<3=5-3=1
  */
 test('simple single line characters delete', function() {
-    equals(generateChangeset('foobarbaz', 'foobaz'), 'Z:6<3=3-3');
+    equals(generateChangeset('foobarbaz', 'foobaz'), 'Z:9<3=5-3=1');
 });
