@@ -24,7 +24,8 @@
 <script type="text/javascript" src="wymeditor/jquery/jquery.js"></script>
 <!-- WYMeditor main JS file, minified version -->
 <script type="text/javascript" src="wymeditor/wymeditor/jquery.wymeditor.js"></script>
-<script type="text/javascript" src="wymplugin.js"></script>
+<script type="text/javascript" src="../wymplugin.js"></script>
+<script type="text/javascript" src="../policypad.js"></script>
 
 <script type="text/javascript">
 
@@ -38,12 +39,26 @@
 
 var initialHtml = '<p><b>Heading</b></p><p>Hello world!</p>';
 
+function wymeditor_onchange(evt) {
+  var counter = $('#counter');
+
+  var i = parseInt(counter.text());
+  i += 1;
+  counter.text(i);
+
+  var autoupdate = $('#autoupdate').attr('checked');
+  if (autoupdate) {
+    update();
+  }
+
+}
+
 jQuery(function() {
     jQuery('.wymeditor').wymeditor({
             html: initialHtml,
             postInit: function(wym) {
                     //activate wymplugin
-                    wym.wymplugin();
+                    wym.wymplugin(wymeditor_onchange);
             }
     });
 });
@@ -51,64 +66,25 @@ jQuery(function() {
 //debugging
 var wym = jQuery.wymeditors(0);
 
-function getLengthToNode(base, child) {
-    return child.parentNode.offsetLeft - base.offsetLeft;
-}
-
-function getCursor() {
-    //there has to be a better way to determine the 
-    //cursor position
-    var wym = jQuery.wymeditors(0);
-    sel = wym._iframe.contentWindow.getSelection();
-    rng = sel.getRangeAt(0);
-    body = rng.startContainer.ownerDocument.body;
-    return rng.startOffset + getLengthToNode(body, rng.startContainer);
-}
-
-function getSelection() {
-    //FIXME: this function is currently broken in
-    //that it returns the start offsets relative
-    //to the selections node, not relative to the
-    //text area's body tag.  Some assumption about
-    //how the html is converted must be made for
-    //this to work.
-    var wym = jQuery.wymeditors(0);
-    sel = wym._iframe.contentWindow.getSelection();
-    res = new Array(sel.rangeCount);
-    for (i = 0; i < sel.rangeCount; i += 1) {
-        range = sel.getRangeAt(i);
-        res[i] = range.startOffset, range.endOffset;
-    }
-    return res;
-}
-
 function update() {
     var wym = jQuery.wymeditors(0);
-    var txtDoc = $('#txtDoc');
-    var txtLog = $('#txtLog');
-    var txtPos = $('#txtPos');
+    var docPrev = $('#docPrev');
+    var docCur = $('#docCur');
+    var changes = $('#changes');
 
     var newhtml = wym.html();
-    var oldhtml = txtDoc.val();
+    var oldhtml = docCur.text();
 
-    if (newhtml == oldhtml) {
-        msg = "No change";
-    } else {
-        msg = "Changeset here";
-    }
-    txtLog.val(msg + "\n" + txtLog.val());
+    msg = generateChangeset(oldhtml, newhtml);
+    changes.prepend(msg + "<br />");
 
-    txtDoc.val(newhtml);
-    //alert("Html: " + html);
-
-    //cursor positioning
-    pos = getCursor(); //getSelection();
-    //txtPos.val(JSON.stringify(pos));
-    txtPos.val(pos);
+    docCur.text(newhtml);
+    docPrev.text(oldhtml);
 }
 
 function initialize() {
     $('#txtDoc').val(initialHtml);
+    $('#docCur').text(initialHtml);
 }
 
 function btnRefresh_onclick() {
@@ -123,18 +99,34 @@ function btnRefresh_onclick() {
 </head>
 
 <body onload="initialize();">
-<h1>WYMeditor integration example</h1>
-<p><a href="http://www.wymeditor.org/">WYMeditor</a> is a web-based XHTML WYSIWYM editor.</p>
+<h1>WYMeditor integration test</h1>
+<p>Test retriving html for diffs, displaying changesets, detecting changes, and edits highlighting</p>
 <form method="post" action="">
 <textarea class="wymeditor">&lt;p&gt;Hello, World!&lt;/p&gt;</textarea>
-<input type="submit" class="wymupdate" />
+<!--input type="submit" class="wymupdate" /-->
 </form>
 
 <form>
-Cursor Position: <textarea id="txtPos" rows="1" cols="40">Cursor position here</textarea> <br />
-Current HTML: <textarea id="txtDoc" rows="4" cols="80">HTML will go here</textarea> <br />
-Changes:<textarea id="txtLog" rows="10" cols="80"></textarea> <br />
-<input type="button" name="btnRefresh" value="Refresh" onclick="btnRefresh_onclick();" />
+  <div>Document updates: <span id="counter">0</span>
+  <br />
+  <div>
+  <div style="width: 47%; margin-right: 50px; display:inline-block; float: left;">
+    Previous HTML: <div id="docPrev">No prior revision</div>
+  </div>
+  <div style="display:inline-block; width: 47%; float:right;">
+    Current HTML: <div id="docCur"></div>
+  </div>
+  </div>
+  <br />
+
+  <div style="clear:both;"></div>
+  <div style="margin-top: 25px; clear:both;">
+    Changes: <div id="changes"></div>
+  </div>
+  <br />
+  
+  <!--Changes:<textarea id="txtLog" rows="10" cols="80"></textarea> <br />-->
+  <input type="button" name="btnRefresh" value="Refresh" onclick="btnRefresh_onclick();" /><input type="checkbox" id="autoupdate">Auto-update</input>
 </form>
 
 </body>

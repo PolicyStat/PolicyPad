@@ -9,15 +9,16 @@ status(string) => void - display text in editor's status bar
 */
 
 //Extend WYMeditor
-WYMeditor.editor.prototype.wymplugin = function() {
+WYMeditor.editor.prototype.wymplugin = function(onchange) {
     var wym = this;
 
     function onkeyup(evt) {
         alert("you pressed a key");
+	onchange();
     }
 
     //add a handler to the keyup event
-    jQuery(wym._doc).bind("keyup", onkeyup);
+    jQuery(wym._doc).bind("keyup", onchange);
 
     //example code
     jQuery(this._box).find(this._options.toolSelector).hover(
