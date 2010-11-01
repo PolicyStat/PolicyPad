@@ -28,7 +28,7 @@ module("Insertion Changeset Generation");
  * Expected: Z:6>3=6+3$baz
  */
 test('simple single line append', function() {
-    equals(generateChangeset('foobar', 'foobarbaz'), 'Z:6>3=6+3$baz');
+    equals(generateChangeset('foobar', 'foobarbaz'), 'Z:6>3=6+3$baz', 'foobar/foobarbaz');
 });
 
 
@@ -39,7 +39,7 @@ test('simple single line append', function() {
  * Expected: Z:2>1=2+1$o
  */
 test('single character append', function() {
-    equals(generateChangeset('fo', 'foo'), 'Z:2>1=2+1$o');
+    equals(generateChangeset('fo', 'foo'), 'Z:2>1=2+1$o', 'fo/foo');
 });
 
 
@@ -50,7 +50,7 @@ test('single character append', function() {
  * Expected: Z:6>3=5+3=1$rba
  */
 test('simple single line insert', function() {
-    equals(generateChangeset('foobaz', 'foobarbaz'), 'Z:6>3=5+3=1$rba');
+    equals(generateChangeset('foobaz', 'foobarbaz'), 'Z:6>3=5+3=1$rba', 'foobaz/foobarbaz');
 });
 
 
@@ -61,7 +61,7 @@ test('simple single line insert', function() {
  * Expected: Z:4>3|1=4+3$bar
  */
 test('simple multi line append', function() {
-    equals(generateChangeset('foo\n', 'foo\nbar'), 'Z:4>3|1=4+3$bar');
+    equals(generateChangeset('foo\n', 'foo\nbar'), 'Z:4>3|1=4+3$bar', 'foo\n/foo\nbar');
 });
 
 
@@ -72,7 +72,7 @@ test('simple multi line append', function() {
  * Expected: Z:7>4|1=4=3|1+1+3$\nbaz
  */
 test('simple multi line append without original newline', function() {
-    equals(generateChangeset('foo\nbar', 'foo\nbar\nbaz'), 'Z:7>4|1=4=3|1+1+3$\nbaz');
+    equals(generateChangeset('foo\nbar', 'foo\nbar\nbaz'), 'Z:7>4|1=4=3|1+1+3$\nbaz', 'foo\nbar/foo\nbar\nbaz');
 });
 
 
@@ -83,7 +83,7 @@ test('simple multi line append without original newline', function() {
  * Expected: Z:7>4|1=4+4$bar\n
  */
 test('simple multi line insert', function() {
-    equals(generateChangeset('foo\nbaz', 'foo\nbar\nbaz'), 'Z:7>4|1=4=2|1+2+2=1$r\nba');
+    equals(generateChangeset('foo\nbaz', 'foo\nbar\nbaz'), 'Z:7>4|1=4=2|1+2+2=1$r\nba', 'foo\nbaz/foo\nbar\nbaz');
 });
 
 
@@ -100,7 +100,7 @@ module('Deletion Changeset Generation');
  * Expected: Z:4<1=3-1
  */
 test('simple single character delete', function() {
-    equals(generateChangeset('fooo', 'foo'), 'Z:4<1=3-1');
+    equals(generateChangeset('fooo', 'foo'), 'Z:4<1=3-1', 'foooo/foo');
 });
 
 
@@ -111,5 +111,5 @@ test('simple single character delete', function() {
  * Expected: Z:9<3=5-3=1
  */
 test('simple single line characters delete', function() {
-    equals(generateChangeset('foobarbaz', 'foobaz'), 'Z:9<3=5-3=1');
+    equals(generateChangeset('foobarbaz', 'foobaz'), 'Z:9<3=5-3=1', 'foobarbaz/foobaz');
 });
