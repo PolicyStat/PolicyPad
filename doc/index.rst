@@ -14,6 +14,7 @@ Contents:
    features
    use-cases
    dfd
+   communication
    changesets
 
 Indices and tables
