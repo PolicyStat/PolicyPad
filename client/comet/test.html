@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>WYMeditor</title>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="streaming-client.js"></script>
+<script type="text/javascript">
+
+function sendMessage(socket, msg) {
+        socket.postMessage(JSON.stringify({type: "COLLABROOM", data: msg}));
+}
+
+function log(msg)
+{
+    var changes = $('#changes');
+    $('<div></div>').text(msg).appendTo(changes)
+}
+
+function handleMessageFromServer(evt)
+{
+	if (!evt.data) return;
+	var wrapper = JSON.parse(evt.data);
+	log("Message from server: " + evt.data);
+}
+
+function handleSocketClosed(params)
+{
+	log("Socket Closed: " + params.reason);
+}
+
+function handleCometHiccup(params)
+{
+	log("Comet Hiccup: connected = " + params.connected);
+}
+
+socketId = 0;
+socket = null;
+
+function btnConnect_onclick()
+{
+        log("Connecting...");
+        socketId = String(Math.floor(Math.random()*1e12));
+        globalPadId = "eoYmdwUbH2";
+        socket = new WebSocket(socketId);
+	rev = 94;
+	userInfo = {"userId": "g.qneusfqoynmuu354", "ip": "192.168.4.1", "colorId": 5, "userAgent": "Firefox3.6.12"};
+	stats = {"screen":"1206,226,1920,1200,1920,1200","ip": "192.168.4.1", "useragent":"Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.2.12) Gecko/20101027 Ubuntu/10.04 (lucid) Firefox/3.6.12"};
+	
+      socket.onmessage = handleMessageFromServer;
+      socket.onclosed = handleSocketClosed;
+        socket.onopen = function() {
+                log("Socket opened, sending CLIENT_READY...");
+                //hiccupCount = 0;
+                //setChannelState("CONNECTED");
+                var msg = { type:"CLIENT_READY", roomType:'padpage',
+                            roomName:'padpage/'+globalPadId,
+                            data: {
+                              lastRev:rev,
+                              userInfo:userInfo,
+                              stats: stats
+                               } };
+                // if (oldSocketId) {
+                //   msg.data.isReconnectOf = oldSocketId;
+                //   msg.data.isCommitPending = (state == "COMMITTING");
+                // }
+                sendMessage(socket, msg);
+                //doDeferredActions();
+        };
+      socket.onhiccup = handleCometHiccup;
+        socket.onlogmessage = log;
+        socket.connect();
+
+
+
+}
+
+function btnDisconnect_onclick()
+{
+	socket.disconnect();
+}
+
+</script>
+
+
+</head>
+
+<body>
+<h1>Testing stuff</h1>
+<form>
+  <input type="button" name="btnConnect" value="Connect" onclick="btnConnect_onclick();" />
+  <input type="button" name="btnDisconnect" value="Disconnect" onclick="btnDisconnect_onclick();" />
+</form>
+<div id="changes"></div>
+
+</body>
+</html>
