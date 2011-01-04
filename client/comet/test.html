@@ -7,8 +7,31 @@
 <script type="text/javascript" src="streaming-client.js"></script>
 <script type="text/javascript">
 
+function getPadValues(host, port, padName, callback) {
+    var url = host + ':' + port + '/' + padName;
+    $.get(url, function(data) {
+        var clientJson = data.match(/var clientVars = (.*);/)[1];
+	log("Retrieved data: " + clientJson);
+	var clientVars = JSON.parse(clientJson);
+        callback(clientVars);
+    });
+}
+
 function sendMessage(socket, msg) {
         socket.postMessage(JSON.stringify({type: "COLLABROOM", data: msg}));
+}
+
+function getStats(serverVars)
+{
+	var stats = {};
+
+	stats.screen = [$(window).width(), $(window).height(),
+		    window.screen.availWidth, window.screen.availHeight,
+		    window.screen.width, window.screen.height].join(',');
+	stats.ip = serverVars.clientIp;
+	stats.useragent = serverVars.clientAgent;
+
+	return stats;
 }
 
 function log(msg)
@@ -36,16 +59,19 @@ function handleCometHiccup(params)
 
 socketId = 0;
 socket = null;
+globalPadId = "";
 
-function btnConnect_onclick()
+function connect_cb(clientVars)
 {
         log("Connecting...");
         socketId = String(Math.floor(Math.random()*1e12));
-        globalPadId = "eoYmdwUbH2";
         socket = new WebSocket(socketId);
-	rev = 94;
-	userInfo = {"userId": "g.qneusfqoynmuu354", "ip": "192.168.4.1", "colorId": 5, "userAgent": "Firefox3.6.12"};
-	stats = {"screen":"1206,226,1920,1200,1920,1200","ip": "192.168.4.1", "useragent":"Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.2.12) Gecko/20101027 Ubuntu/10.04 (lucid) Firefox/3.6.12"};
+	//rev = 94;
+	//userInfo = {"userId": "g.qneusfqoynmuu354", "ip": "192.168.4.1", "colorId": 5, "userAgent": "Firefox3.6.12"};
+	//stats = {"screen":"1206,226,1920,1200,1920,1200","ip": "192.168.4.1", "useragent":"Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.2.12) Gecko/20101027 Ubuntu/10.04 (lucid) Firefox/3.6.12"};
+	rev = clientVars.collab_client_vars.rev;
+	userInfo = {"userId": clientVars.userId, "ip": clientVars.collab_client_vars.clientIp, "colorId": clientVars.userColor, "userAgent": clientVars.userAgent};
+	stats = getStats(clientVars.collab_client_vars);
 	
       socket.onmessage = handleMessageFromServer;
       socket.onclosed = handleSocketClosed;
@@ -72,6 +98,16 @@ function btnConnect_onclick()
         socket.connect();
 
 
+}
+
+function btnConnect_onclick()
+{
+ 	var txtPadId = $("#txtPadId");
+	globalPadId = txtPadId.val();
+	//globalPadId = "eoYmdwUbH2";
+	log(globalPadId);
+	log("Retrieving initial state...")
+	getPadValues("http://kevinwells.homeip.net", 8082, globalPadId, connect_cb);
 
 }
 
@@ -88,6 +124,7 @@ function btnDisconnect_onclick()
 <body>
 <h1>Testing stuff</h1>
 <form>
+  Pad Id: <input type="text" id="txtPadId" value="eoYmdwUbH2" /> <br />
   <input type="button" name="btnConnect" value="Connect" onclick="btnConnect_onclick();" />
   <input type="button" name="btnDisconnect" value="Disconnect" onclick="btnDisconnect_onclick();" />
 </form>
