@@ -98,7 +98,7 @@ function connect_cb(clientVars)
       socket.onhiccup = handleCometHiccup;
         socket.onlogmessage = log;
         socket.connect();
-        setName(socket, 'NameChangeWorked', userInfo.userId, userInfo.ip, userInfo.userAgent);
+        setTimeout("setName(socket, 'NameChangeWorked', userInfo.userId, userInfo.ip, userInfo.userAgent)", 3000);
 }
 
 function setName(socket, name, userId, ip, userAgent)
