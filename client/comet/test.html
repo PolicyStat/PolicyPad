@@ -96,8 +96,17 @@ function connect_cb(clientVars)
       socket.onhiccup = handleCometHiccup;
         socket.onlogmessage = log;
         socket.connect();
+        setName(socket, 'NameChangeWorked', userInfo.userId, userInfo.ip, userInfo.userAgent);
+}
 
-
+function setName(socket, name, userId, ip, userAgent)
+{
+    sendMessage(socket, {'type': 'USERINFO_UPDATE',
+                         'userInfo': {'userId': userId,
+                                      'name': name,
+                                      'ip': ip,
+                                      'colorId': 2, /* hard coded for now */
+                                      'userAgent': userAgent}});
 }
 
 function btnConnect_onclick()
