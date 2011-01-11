@@ -18,7 +18,9 @@ function getPadValues(host, port, padName, callback) {
 }
 
 function sendMessage(socket, msg) {
-        socket.postMessage(JSON.stringify({type: "COLLABROOM", data: msg}));
+        var strMsg = JSON.stringify({type: 'COLLABROOM', data: msg});
+        log("Sending message: " + strMsg);
+        socket.postMessage(strMsg);
 }
 
 function getStats(serverVars)
