@@ -24,8 +24,12 @@
 <script type="text/javascript" src="wymeditor/jquery/jquery.js"></script>
 <!-- WYMeditor main JS file, minified version -->
 <script type="text/javascript" src="wymeditor/wymeditor/jquery.wymeditor.js"></script>
-<script type="text/javascript" src="../wymplugin.js"></script>
+
+<script type="text/javascript" src="http://kevinwells.homeip.net:8082/comet/js/client.js"></script>
+<script type="text/javascript" src="http://kevinwells.homeip.net:8082/static/js/collab_client.js"></script>
+<script type="text/javascript" src="http://kevinwells.homeip.net:8082/static/js/pad_utils.js"></script>
 <script type="text/javascript" src="../policypad.js"></script>
+<script type="text/javascript" src="../etherpadplugin.js"></script>
 
 <script type="text/javascript">
 
@@ -37,62 +41,55 @@
  * the element being replaced.
  */
 
-var initialHtml = '<p><b>Heading</b></p><p>Hello world!</p>';
+function getQueryParams(qs) {
+    qs = qs.split("+").join(" ");
+    var params = {};
+    var tokens;
 
-function wymeditor_onchange(evt) {
-  var counter = $('#counter');
-
-  var i = parseInt(counter.text());
-  i += 1;
-  counter.text(i);
-
-  var autoupdate = $('#autoupdate').attr('checked');
-  if (autoupdate) {
-    update();
-  }
-
+    while (tokens = /[?&]?([^=]+)=([^&]*)/g.exec(qs)) {
+        params[decodeURIComponent(tokens[1])] = decodeURIComponent(tokens[2]);
+    }
+    return params;
 }
+var $_GET = getQueryParams(document.location.search);
+
+/* DESIGN DECISION
+
+   Do we want to query the initial html from within the plugin, or do we want to do
+   that from outside.  An implication is that we need clientVars too, and that typically
+   comes along with the initial html that we scrape
+
+*/
 
 jQuery(function() {
     jQuery('.wymeditor').wymeditor({
-            html: initialHtml,
-            postInit: function(wym) {
-                    //activate wymplugin
-                    wym.etherpad({
-			funcOnChange: wymeditor_onchange
-			}).init();
-            }
+        html: '', //This can override
+        postInit: function(wym) {
+            //activate wymplugin
+            wym.etherpad({
+                padId: $_GET["padId"],
+                funcLog: debug_log,
+                host: window.location.host,
+	        }).init();
+        }
     });
 });
 
-//debugging
-var wym = jQuery.wymeditors(0);
-
-function update() {
-    var wym = jQuery.wymeditors(0);
-    var docPrev = $('#docPrev');
-    var docCur = $('#docCur');
-    var changes = $('#changes');
-
-    var newhtml = wym.html();
-    var oldhtml = docCur.text();
-
-    msg = generateChangeset(oldhtml, newhtml);
-
-    $('<div></div>').text(msg).prependTo(changes)
-    //changes.prepend(msg + "<br />");
-
-    docCur.text(newhtml);
-    docPrev.text(oldhtml);
+function debug_log(msg)
+{
+    var debug = $('#debug');
+    $('<div></div>').text(msg).prependTo(debug);
+    $("<br/>").prependTo(debug);
 }
 
-function initialize() {
-    $('#txtDoc').val(initialHtml);
-    $('#docCur').text(initialHtml);
+function initialize()
+{
 }
 
 function btnRefresh_onclick() {
-        update();
+    var wym = jQuery.wymeditors(0);
+    wym._etherpad.manualPushChanges();
+    
 }
 
 
@@ -103,35 +100,14 @@ function btnRefresh_onclick() {
 </head>
 
 <body onload="initialize();">
-<h1>WYMeditor integration test</h1>
-<p>Test retriving html for diffs, displaying changesets, detecting changes, and edits highlighting</p>
+<h1>WYMeditor/Etherpad Working Demo</h1>
 <form method="post" action="">
-<textarea class="wymeditor">&lt;p&gt;Hello, World!&lt;/p&gt;</textarea>
+<textarea class="wymeditor">Loading...</textarea>
 <!--input type="submit" class="wymupdate" /-->
+<input type="button" name="btnRefresh" value="Refresh" onclick="btnRefresh_onclick()" />
 </form>
-
-<form>
-  <div>Document updates: <span id="counter">0</span>
-  <br />
-  <div>
-  <div style="width: 47%; margin-right: 50px; display:inline-block; float: left;">
-    Previous HTML: <div id="docPrev">No prior revision</div>
-  </div>
-  <div style="display:inline-block; width: 47%; float:right;">
-    Current HTML: <div id="docCur"></div>
-  </div>
-  </div>
-  <br />
-
-  <div style="clear:both;"></div>
-  <div style="margin-top: 25px; clear:both;">
-    Changes: <div id="changes"></div>
-  </div>
-  <br />
-  
-  <!--Changes:<textarea id="txtLog" rows="10" cols="80"></textarea> <br />-->
-  <input type="button" name="btnRefresh" value="Refresh" onclick="btnRefresh_onclick();" /><input type="checkbox" id="autoupdate">Auto-update</input>
-</form>
+    
+Debug Output: <div id="debug"></div>
 
 </body>
 </html>
