@@ -27,6 +27,7 @@ status(string) => void - display text in editor's status bar
 WYMeditor.editor.prototype.etherpad = function(options) {
   var etherpad = new WymEtherpad(options, this);
   this._etherpad = etherpad;
+  //FIXME: MAKE THE GUI HERE
   return(etherpad);
 };
 
@@ -130,7 +131,7 @@ WymEtherpad.prototype.getPadValues = function(host, padName, callback) {
 }
 
 WymEtherpad.prototype.manualPushChanges = function() {
-  this.prepareUserChangeset();
+  this._changecb();
 }
 
 //BEGIN Ace2Editor interface
@@ -157,8 +158,8 @@ WymEtherpad.prototype.prepareUserChangeset = function()
 {
     this.log("E: prepareUserChangeset()");
     payload = {
-      changeset: generateChangeset(this._last, this._wym.html()),
-      //changeset: "Z:d>1=1*0+1$a",//TODO: Use real changset: generateChangeset(this._last, this._wym.html()),
+      //changeset: generateChangeset(this._last, this._wym.html()),
+      changeset: "Z:d>1=1*0+1$a",//TODO: Use real changset: generateChangeset(this._last, this._wym.html()),
       apool: {
               numToAttrib: {0: ["author", this._clientVars.userId]},
               nextNum: 1} //TODO: populate with real data

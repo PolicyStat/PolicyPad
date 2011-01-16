@@ -16,11 +16,23 @@
 
 
 /**
- * Compares oldText and newText, generating a changeset of the differences.
- * @param {String} oldText The original editor text.
- * @param {String} newText The editor text after changes have been made.
- * @return A changeset representing the differences between oldText and newText.
+ * Takes oldText and applies the given changeset to it.
+ * @param {String} oldText The original text to modify.
+ * @param {String} changeset The changeset to apply the document
+ * @return A new document, transformed by the changeset
  */
+function applyChangeset(oldText, changeset) {
+  var res = '';
+  var parts = changeset.split('$');
+  
+  if (!changeset.startswith("Z:")) return null;
+  if (parts.length != 2) return null;
+  
+  var bank = parts[1];
+  changeset = parts[0];
+
+  return oldText + bank;
+}
 
 function wordDiff(file1, file2) {
     /* Text diff algorithm following Hunt and McIlroy 1976.
@@ -134,6 +146,12 @@ function wordDiff(file1, file2) {
 }
 
 
+/**
+ * Compares oldText and newText, generating a changeset of the differences.
+ * @param {String} oldText The original editor text.
+ * @param {String} newText The editor text after changes have been made.
+ * @return A changeset representing the differences between oldText and newText.
+ */
 function generateChangeset(oldText, newText) {
     var wd = wordDiff(oldText, newText); 
 
