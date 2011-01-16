@@ -29,6 +29,7 @@
 <script type="text/javascript" src="http://kevinwells.homeip.net:8082/static/js/collab_client.js"></script>
 <script type="text/javascript" src="http://kevinwells.homeip.net:8082/static/js/pad_utils.js"></script>
 <script type="text/javascript" src="../policypad.js"></script>
+<script type="text/javascript" src="../wymetherpad.js"></script>
 <script type="text/javascript" src="../etherpadplugin.js"></script>
 
 <script type="text/javascript">
@@ -62,17 +63,20 @@ var $_GET = getQueryParams(document.location.search);
 */
 
 jQuery(function() {
-    jQuery('.wymeditor').wymeditor({
-        html: '', //This can override
-        postInit: function(wym) {
-            //activate wymplugin
-            wym.etherpad({
-                padId: $_GET["padId"],
-                funcLog: debug_log,
-                host: window.location.host,
-	        }).init();
-        }
-    });
+  jQuery('.wymeditor').wymeditor({
+    html: '', //This can override
+    postInit: function(wym) {
+      //activate wymplugin
+      wym.etherpad({
+        //GUI options
+      },{
+        //Options
+        padId: $_GET["padId"],
+        funcLog: debug_log,
+        host: window.location.host,
+      }).init();
+    }
+  });
 });
 
 function debug_log(msg)
