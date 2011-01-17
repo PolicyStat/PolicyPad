@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-// constructor
+//constructor
 function WymEtherpad(options, wym) {
     
   var initial_options = {
@@ -32,6 +32,7 @@ WymEtherpad.prototype.init = function() {
 
   var etherpad = this;
 
+  //Get our initial data
   this.getPadValues(this._options.host || window.location.host, this._options.padId, function(clientVars) {
     //Create our client, using the data from clientVars
     etherpad._clientVars = clientVars;
@@ -68,6 +69,8 @@ WymEtherpad.prototype.testGuiEvent = function() {
   var wym = this._wym;
 
   this.log("You clicked on the toolbar");
+  this._doc.applyChangeset('adf', 3);
+  this.log("You clicked ");
 };
 
 //BEGIN 'private' methods
@@ -83,9 +86,11 @@ WymEtherpad.prototype.getPadValues = function(host, padName, callback) {
 
   var url = 'http://' + host + '/' + padName;
   $.get(url, function(data) {
-    var clientJson = data.match(/var clientVars = (.*);/)[1];
+    var clientJson = data.match(/var (clientVars = .*;)/)[1];
     etherpad.log("Retrieved data: " + clientJson);
-    var clientVars = JSON.parse(clientJson);
+    //FIXME: using eval here is bad, but issues with JSON.parse prevent this
+    //from working...
+    eval(clientJson);
     callback(clientVars);
   });
 }
@@ -99,9 +104,13 @@ WymEtherpad.prototype.setProperty = function(key, val)
 
 WymEtherpad.prototype.setBaseAttributedText = function(initialText, apool)
 {
-    this.log("setBaseAttributedText(" + JSON.stringify(initialText) + ", " + JSON.stringify(apool) + ")");
-    this._wym.html(initialText.text);
-    this._last = initialText.text; //TODO: manage revisions a bit better
+  var etherpad = this;
+
+  this.log("setBaseAttributedText(" + JSON.stringify(initialText) + ", " + JSON.stringify(apool) + ")");
+  this._wym.html(initialText.text);
+  
+  //Create our document wrapper around this._wym.html to track changes
+  this._doc = new EtherpadDocument(function(val){ etherpad._wym.html(val) });
 }
 
 WymEtherpad.prototype.setUserChangeNotificationCallback = function(cb)
@@ -114,8 +123,7 @@ WymEtherpad.prototype.prepareUserChangeset = function()
 {
     this.log("E: prepareUserChangeset()");
     payload = {
-      //changeset: generateChangeset(this._last, this._wym.html()),
-      changeset: "Z:d>1=1*0+1$a",//TODO: Use real changset: generateChangeset(this._last, this._wym.html()),
+      changeset: this._doc.generateChangeset(),
       apool: {
               numToAttrib: {0: ["author", this._clientVars.userId]},
               nextNum: 1} //TODO: populate with real data

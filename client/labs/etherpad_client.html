@@ -29,6 +29,7 @@
 <script type="text/javascript" src="http://kevinwells.homeip.net:8082/static/js/collab_client.js"></script>
 <script type="text/javascript" src="http://kevinwells.homeip.net:8082/static/js/pad_utils.js"></script>
 <script type="text/javascript" src="../policypad.js"></script>
+<script type="text/javascript" src="../etherpaddocument.js"></script>
 <script type="text/javascript" src="../wymetherpad.js"></script>
 <script type="text/javascript" src="../etherpadplugin.js"></script>
 
@@ -74,7 +75,7 @@ jQuery(function() {
         padId: $_GET["padId"],
         funcLog: debug_log,
         host: window.location.host,
-      }).init();
+      });
     }
   });
 });
@@ -92,7 +93,7 @@ function initialize()
 
 function btnRefresh_onclick() {
     var wym = jQuery.wymeditors(0);
-    wym._etherpad.manualPushChanges();
+    wym._etherpad.submitChanges();
     
 }
 

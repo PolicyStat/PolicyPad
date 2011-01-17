@@ -61,6 +61,7 @@ WYMeditor.editor.prototype.etherpad = function(guioptions, options) {
   //     function() { wym.status('hi'); }
   // );
 
-  return(etherpad);
+  etherpad.init();
+  return etherpad;
 };
 
