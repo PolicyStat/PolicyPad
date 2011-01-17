@@ -25,7 +25,7 @@ function applyChangeset(oldText, changeset) {
   var res = '';
   var parts = changeset.split('$');
   
-  if (!changeset.startswith("Z:")) return null;
+  if (changeset.substring(0,2) != "Z:") return null;
   if (parts.length != 2) return null;
   
   var bank = parts[1];

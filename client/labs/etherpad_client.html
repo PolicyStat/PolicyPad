@@ -74,6 +74,7 @@ jQuery(function() {
         //Options
         padId: $_GET["padId"],
         funcLog: debug_log,
+        funcStatus: function(msg) { return wym.status(msg); },
         host: window.location.host,
       });
     }

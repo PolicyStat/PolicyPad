@@ -26,6 +26,11 @@
  */
 function EtherpadDocument(func) {
   this._func = func;
+  //TODO: This class needs to track more than just HTML. In Etherpad, the text
+  //consists of both the text and the mapping of text to attributes.  Etherpad
+  //also tracks an attribute pool (apool) which provides formatting information,
+  //but more importantly, authorship information.  Changeset manipulation needs
+  //to manipulate both the text and the text/apool mappings.
   this._prevHtml = this._func();
 }
 
@@ -40,10 +45,16 @@ EtherpadDocument.prototype.generateChangeset = function() {
 
 EtherpadDocument.prototype.applyChangeset = function(changeset, apool) {
   //1. Generate changeset between html and prevHtml
-  var diff = generateChangeset(this._prevHtml, this._func());
+  //var diff = generateChangeset(this._prevHtml, this._func());
 
   //2. Merge the two changesets
   //3. Apply the changeset to html
   //4. Apply changeset to prevHtml
+
+
+  //FIXME: remove temp code
+  newhtml = applyChangeset(this._prevHtml, changeset);
+  this._func(newhtml);
+  this._prevHtml = newhtml;
   return;
 }

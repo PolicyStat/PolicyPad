@@ -19,6 +19,7 @@ function WymEtherpad(options, wym) {
     
   var initial_options = {
     funcLog: null,
+    funcStatus: null,
     host: '',
     padId: ''
   };
@@ -33,6 +34,7 @@ WymEtherpad.prototype.init = function() {
   var etherpad = this;
 
   //Get our initial data
+  this.status("Connecting to server...");
   this.getPadValues(this._options.host || window.location.host, this._options.padId, function(clientVars) {
     //Create our client, using the data from clientVars
     etherpad._clientVars = clientVars;
@@ -69,8 +71,6 @@ WymEtherpad.prototype.testGuiEvent = function() {
   var wym = this._wym;
 
   this.log("You clicked on the toolbar");
-  this._doc.applyChangeset('adf', 3);
-  this.log("You clicked ");
 };
 
 //BEGIN 'private' methods
@@ -79,6 +79,19 @@ WymEtherpad.prototype.log = function(msg) {
   var funcLog = this._options.funcLog;
   if (funcLog)
     funcLog(msg);
+}
+
+WymEtherpad.prototype.status = function(msg) {
+  var funcStatus = this._options.funcStatus;
+  if (funcStatus) {
+    funcStatus(msg);
+    setTimeout(function() {
+      //FIXME: this did not work as intended (funcStatus will not return the
+      //current value?)
+      if (funcStatus() == msg)
+        funcStatus('');
+    }, 5000);
+  }
 }
 
 WymEtherpad.prototype.getPadValues = function(host, padName, callback) {
@@ -110,7 +123,8 @@ WymEtherpad.prototype.setBaseAttributedText = function(initialText, apool)
   this._wym.html(initialText.text);
   
   //Create our document wrapper around this._wym.html to track changes
-  this._doc = new EtherpadDocument(function(val){ etherpad._wym.html(val) });
+  this._doc = new EtherpadDocument(function(val){ return etherpad._wym.html(val) });
+  this.status("Connected");
 }
 
 WymEtherpad.prototype.setUserChangeNotificationCallback = function(cb)
@@ -135,6 +149,7 @@ WymEtherpad.prototype.prepareUserChangeset = function()
 WymEtherpad.prototype.applyChangesToBase = function(changeset, author, apool)
 {
     this.log("applyChangesToBase(" + changeset + ", " + author + ", " + JSON.stringify(apool) + ")");
+    this._doc.applyChangeset(changeset, apool);
 }
 
 WymEtherpad.prototype.applyPreparedChangesetToBase = function()
