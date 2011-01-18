@@ -99,3 +99,17 @@ test('multiple character removals with attributes and newlines', function() {
     equals(applyChangeset('foo\nbazbar', 'Z:a<3*0|1=4-3$'), 'foo\nbar', 'foo\nbazbar/foo\nbar');
     equals(applyChangeset('foo\nbarbaz', 'Z:a<3*0|1=4*2=3-3$'), 'foo\nbar', 'foo\nbarbaz/foo\nbar');
 });
+
+test('multiple insertions', function() {
+  equals(applyChangeset('foobar', 'Z:6>3*1+1*0=3*1+1*3=3*1+1$zzz'), 'zfoozbarz', 'foobar/zfoozbarz');
+  equals(applyChangeset('foobar', 'Z:6>9*1+3*0=3*1+3*3=3*1+3$bazbazbaz'), 'bazfoobazbarbaz', 'foobar/bazfoobazbarbaz');
+});
+
+test('multiple deletions', function() {
+  equals(applyChangeset('zfoozbarz'      , 'Z:9<3-1*0=3-1*0=3-1$'), 'foobar', 'zfoozbarz/foobar');
+  equals(applyChangeset('bazfoobazbarbaz', 'Z:f<9-3*0=3-3*0=3-3$'), 'foobar', 'bazfoobazbarba/zfoobar');
+});
+
+
+
+
