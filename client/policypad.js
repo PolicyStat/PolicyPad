@@ -29,7 +29,53 @@ function applyChangeset(oldText, changeset) {
   if (parts.length != 2) return null;
   
   var bank = parts[1];
-  changeset = parts[0];
+  changeset = parts[0].substring(2);
+
+  convBase36 = function(str) { return parseInt(str, 36); }
+
+  parts = changeset.match(/^(\w+)([><])(\w+)/);
+  if (!parts)
+    return null;
+  oldlen = convBase36(parts[1]);
+  newlen = convBase36(parts[3]);
+  switch (parts[2])
+  {
+    case '<':
+      newlen = oldlen - newlen;
+      break;
+    case '>':
+      newlen += oldlen;
+      break;
+    default:
+      return null;
+  }
+
+  if (oldText.length != oldlen)
+    return null;
+
+  changeset = changeset.substring(parts[0].length);
+
+  function OpIterator(changeset) {
+    this._lens = changeset.split(/[|=+*-]/);
+    this._ops = changeset.split(/\w+/);
+    this._lens.shift();
+    this._ops.pop();
+  }
+
+  OpIterator.prototype.next = function() {
+    if (this._lens.length == 0)
+      throw StopIteration;
+    return {op: this._ops.shift(), len: this._lens.shift()};    
+  }
+
+  OpIterator.prototype.__iterator__ = function() { return this; }
+
+  var ops = new OpIterator(changeset);
+  for (var part in ops) {
+    //TODO: finish
+    //alert(JSON.stringify(part));
+  }
+  
 
   return oldText + bank;
 }
