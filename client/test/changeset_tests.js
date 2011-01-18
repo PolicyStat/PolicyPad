@@ -19,97 +19,28 @@
  * These test deal with generating changesets based in user 
  * insertions in the editor.
  */
-module("Insertion Changeset Generation");
+module('Changeset Generation - Insertion');
 
-/**
- * Old: foobar
- * New: foobarbaz
- *
- * Expected: Z:6>3=6+3$baz
- */
-test('simple single line append', function() {
-    equals(generateChangeset('foobar', 'foobarbaz'), 'Z:6>3=6+3$baz', 'foobar/foobarbaz');
+test('single line insertions', function() {
+    equals(generateChangeset('foobar', 'foobarbaz'), 'Z:6>3=6*0+3$baz', 'foobar/foobarbaz');
+    equals(generateChangeset('fo', 'foo'), 'Z:2>1=2*0+1$o', 'fo/foo');
+    equals(generateChangeset('foo', 'foobarfoobarfoobarfoobarfoobarfoobarfoobarfoo'), 'Z:3>16=3*0+16$barfoobarfoobarfoobarfoobarfoobarfoobarfoo', 'foo/foobarfoobarfoobarfoobarfoobarfoobarfoobarfoo');
+    equals(generateChangeset('foobaz', 'foobarbaz'), 'Z:6>3=5*0+3$rba', 'foobaz/foobarbaz');
 });
 
-
-/**
- * Old: fo
- * New: foo
- *
- * Expected: Z:2>1=2+1$o
- */
-test('single character append', function() {
-    equals(generateChangeset('fo', 'foo'), 'Z:2>1=2+1$o', 'fo/foo');
+test('multiline insertions', function() {
+    equals(generateChangeset('foo\n', 'foo\nbar'), 'Z:4>3|1=4*0+3$bar', 'foo\n/foo\nbar');
+    equals(generateChangeset('foo\nbar', 'foo\nbar\nbaz'), 'Z:7>4|1=4=3*0|1+1*0+3$\nbaz', 'foo\nbar/foo\nbar\nbaz');
+    equals(generateChangeset('foo\nbaz', 'foo\nbar\nbaz'), 'Z:7>4|1=4=2*0|1+2*0+2$r\nba', 'foo\nbaz/foo\nbar\nbaz');
 });
-
-
-/**
- * Old: foobaz
- * New: foobarbaz
- *
- * Expected: Z:6>3=5+3=1$rba
- */
-test('simple single line insert', function() {
-    equals(generateChangeset('foobaz', 'foobarbaz'), 'Z:6>3=5+3=1$rba', 'foobaz/foobarbaz');
-});
-
-
-/**
- * Old: foo\n
- * New: foo\nbar
- * 
- * Expected: Z:4>3|1=4+3$bar
- */
-test('simple multi line append', function() {
-    equals(generateChangeset('foo\n', 'foo\nbar'), 'Z:4>3|1=4+3$bar', 'foo\n/foo\nbar');
-});
-
-
-/**
- * Old: foo\nbar
- * New: foo\nbar\nbaz
- *
- * Expected: Z:7>4|1=4=3|1+1+3$\nbaz
- */
-test('simple multi line append without original newline', function() {
-    equals(generateChangeset('foo\nbar', 'foo\nbar\nbaz'), 'Z:7>4|1=4=3|1+1+3$\nbaz', 'foo\nbar/foo\nbar\nbaz');
-});
-
-
-/**
- * Old: foo\nbaz
- * New: foo\nbar\nbaz
- *
- * Expected: Z:7>4|1=4+4$bar\n
- */
-test('simple multi line insert', function() {
-    equals(generateChangeset('foo\nbaz', 'foo\nbar\nbaz'), 'Z:7>4|1=4=2|1+2+2=1$r\nba', 'foo\nbaz/foo\nbar\nbaz');
-});
-
 
 /**
  * These tests deal with generating changesets based on deletions
  * from within the editor.
  */
-module('Deletion Changeset Generation');
+module('Changeset Generation - Deletion');
 
-/**
- * Old: fooo
- * New: foo
- *
- * Expected: Z:4<1=3-1
- */
-test('simple single character delete', function() {
+test('single line deletions', function() {
     equals(generateChangeset('fooo', 'foo'), 'Z:4<1=3-1', 'foooo/foo');
-});
-
-
-/**
- * Old: foobarbaz
- * New: foobaz
- *
- * Expected: Z:9<3=5-3=1
- */
-test('simple single line characters delete', function() {
-    equals(generateChangeset('foobarbaz', 'foobaz'), 'Z:9<3=5-3=1', 'foobarbaz/foobaz');
+    equals(generateChangeset('foobarbaz', 'foobaz'), 'Z:9<3=5-3', 'foobarbaz/foobaz');
 });

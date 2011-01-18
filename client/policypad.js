@@ -153,17 +153,20 @@ function wordDiff(file1, file2) {
  * @return A changeset representing the differences between oldText and newText.
  */
 function generateChangeset(oldText, newText) {
+    var packNum = function(num) { return num.toString(36).toLowerCase(); };
+
     var wd = wordDiff(oldText, newText); 
 
     var result = 'Z:';
 
     var pot = '';
 
-    result += oldText.length; // original length
+    result += packNum(oldText.length); // original length
     result += newText.length > oldText.length 
-        ? '>' + (newText.length - oldText.length) 
-        : '<' + (oldText.length - newText.length); // length change 
+        ? '>' + packNum(newText.length - oldText.length) 
+        : '<' + packNum(oldText.length - newText.length); // length change
 
+    var skips = '';
 
     $.each(wd, function(i, cs) {
         var keep = 0; // non-newline characters to keep
@@ -210,14 +213,19 @@ function generateChangeset(oldText, newText) {
                 ins = added.length - lastN - 1;
             }
         }
+
+        skips += keepN > 0 ? '|' + packNum(numN) + '=' + packNum(keepN) : '';
+        skips += keep > 0 ? '=' + packNum(keep) : '';
         
-        
-        result += keepN > 0 ? '|' + numN + '=' + keepN : '';  
-        result += keep > 0 ? '=' + keep : '';
-        result += delN > 0 ? '|' + numN + '-' + delN : '';  
-        result += del > 0 ? '-' + del : '';
-        result += insN > 0 ? '|' + numN + '+' + insN : '';  
-        result += ins > 0 ? '+' + ins : '';
+        if (delN > 0 || del > 0 || insN > 0 || ins > 0) {
+            result += skips;
+            skips = '';
+        }
+
+        result += delN > 0 ? '|' + packNum(numN) + '-' + packNum(delN) : '';  
+        result += del > 0 ? '-' + packNum(del) : '';
+        result += insN > 0 ? '*0|' + packNum(numN) + '+' + packNum(insN) : ''; // TODO: Don't hard code "0" authorship attribute 
+        result += ins > 0 ? '*0+' + packNum(ins) : '';                         // 
     });
 
     result += pot.length > 0 ? '$' + pot : '';

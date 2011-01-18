@@ -39,8 +39,8 @@ EtherpadDocument.prototype.generateChangeset = function() {
     return null;
   var changeset = generateChangeset(this._prevHtml, this._func());
   this._prevHtml = this._func();
-  //return changeset;
-  return "Z:d>1=1*0+1$a";//TODO: Use real changset
+  return changeset;
+  //return "Z:d>1=1*0+1$a";//TODO: Use real changset
 }
 
 EtherpadDocument.prototype.applyChangeset = function(changeset, apool) {
