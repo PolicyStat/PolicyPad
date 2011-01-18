@@ -61,23 +61,53 @@ function applyChangeset(oldText, changeset) {
     this._lens.shift();
     this._ops.pop();
   }
-
   OpIterator.prototype.next = function() {
     if (this._lens.length == 0)
       throw StopIteration;
-    return {op: this._ops.shift(), len: this._lens.shift()};    
+    return {op: this._ops.shift(), len: convBase36(this._lens.shift())};
   }
-
   OpIterator.prototype.__iterator__ = function() { return this; }
 
   var ops = new OpIterator(changeset);
+  var i = 0;
+  var attribs = [];
+  var newlines = 0;
   for (var part in ops) {
-    //TODO: finish
-    //alert(JSON.stringify(part));
+    switch (part.op) {
+      case '=':
+        change = oldText.substring(i, i + part.len);
+        if (change.split('\n').length-1 != newlines)
+          return null;
+        res += change;
+        i += part.len;
+        newlines = 0;
+        break;
+      case '*':
+        //TODO: update attribs
+        break;
+      case '|':
+        newlines = part.len;
+        break;
+      case '+':
+        res += bank.substring(0, part.len);
+        bank = bank.substring(part.len);
+        break;
+      case '-':
+        if (oldText.substring(i, i + part.len).split('\n').length-1 != newlines)
+          return null;
+        i += part.len;
+        newlines = 0;
+        break;
+    }
   }
   
+  //The rest of the document is unchanged
+  res += oldText.substring(i);
 
-  return oldText + bank;
+  if (res.length != newlen)
+    return null;
+
+  return res;
 }
 
 function wordDiff(file1, file2) {
