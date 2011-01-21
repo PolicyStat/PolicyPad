@@ -28,10 +28,9 @@ module('Insertion');
 
 test('non-overlapping merge',
      function() {
-	 equals(mergeChangeset('Z:C>0=3+2=4-2$ch' 'Z:C>0+2-2$as'), 'Z:C>0+2=1+2=4-2$asch');
-	 equals(mergeChangeset('Z:C>0=3+2=4-2$ch' 'Z:C>0+2-2$as'), 'Z:C>0+2=1+2=4-2$asch');
-	 equals(mergeChangeset('Z:C>0=3+2=4-2$ch' 'Z:C>0+2-2$as'), 'Z:C>0+2=1+2=4-2$asch');
-	 equals(mergeChangeset('Z:C>0=3+2=4-2$ch' 'Z:C>0+2-2$as'), 'Z:C>0+2=1+2=4-2$asch');
+	 equals(mergeChangeset('Z:d>6=3*0+6$jacob ', 'Z:j>5=b*0+5$ cool'), 'Z:d>b=3*0+6=2*0+5$jacob cool');
+	 equals(mergeChangeset('Z:1f>e=17*0+e$Kevin Wells is', 'Z:1t>5=1l*0+5$ good'), 'Z:1f>n=17*0|1+1=1-2*0+2=2*0+m$ /pp>Kevin Wells is good<');
+	 equals(mergeChangeset('Z:C>2*0=4+2$ob' 'Z:C>3*0+3$jac'), 'Z:C>5*0+3=1+2$jacob');
      }
 );
 

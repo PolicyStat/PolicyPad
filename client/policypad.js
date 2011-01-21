@@ -308,3 +308,9 @@ function generateChangeset(oldText, newText) {
 
     return result;
 }
+
+function mergeChangeset(cs1, cs2) {
+    // TODO: Check if code like this already exists
+    // Particularly check changeset.js in same directory - written by our team???
+    return '';
+}
