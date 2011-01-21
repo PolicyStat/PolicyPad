@@ -15,17 +15,19 @@
 */
 
 //constructor
-function WymEtherpad(options, wym) {
+function WymEtherpad(options, callbacks) {
     
   var initial_options = {
     funcLog: null,
     funcStatus: null,
     host: '',
-    padId: ''
+    padId: '',
+    initialText: null
   };
   
   this._options = jQuery.extend(initial_options, options);
-  this._wym = wym;
+  this._callbacks = callbacks;
+  this._initialized = false;
 };
 
 //WymEtherpad initialization
@@ -72,8 +74,6 @@ WymEtherpad.prototype.submitChanges = function() {
 }
 
 WymEtherpad.prototype.testGuiEvent = function() {
-  var wym = this._wym;
-
   this.log("You clicked on the toolbar");
 };
 
@@ -86,16 +86,7 @@ WymEtherpad.prototype.log = function(msg) {
 }
 
 WymEtherpad.prototype.status = function(msg) {
-  var funcStatus = this._options.funcStatus;
-  if (funcStatus) {
-    funcStatus(msg);
-    setTimeout(function() {
-      //FIXME: this did not work as intended (funcStatus will not return the
-      //current value?)
-      if (funcStatus() == msg)
-        funcStatus('');
-    }, 5000);
-  }
+  this._callbacks.status(msg);
 }
 
 WymEtherpad.prototype.getPadValues = function(host, padName, callback) {
@@ -114,35 +105,29 @@ WymEtherpad.prototype.getPadValues = function(host, padName, callback) {
 
 //BEGIN Ace2Editor interface
 
-WymEtherpad.prototype.setProperty = function(key, val)
-{
+WymEtherpad.prototype.setProperty = function(key, val) {
     this.log("Setting property (" + key + "): " + val);
 }
 
-WymEtherpad.prototype.setBaseAttributedText = function(initialText, apool)
-{
+WymEtherpad.prototype.setBaseAttributedText = function(initialText, apool) {
   var etherpad = this;
 
   this.log("setBaseAttributedText(" + JSON.stringify(initialText) + ", " + JSON.stringify(apool) + ")");
-  this._wym.html(initialText.text);
+  this._callbacks.html(initialText.text);
   
-  //Create our document wrapper around this._wym.html to track changes
-  this._doc = new EtherpadDocument(function(val){ return etherpad._wym.html(val) });
-  this.status("Connected");
+  //Create our document wrapper around this._etherpad.html to track changes
+  this._doc = new EtherpadDocument(function(val){ return etherpad._callbacks.html(val) });
+  this.status("Waiting for user listing...");
 }
 
-WymEtherpad.prototype.setUserChangeNotificationCallback = function(cb)
-{
+WymEtherpad.prototype.setUserChangeNotificationCallback = function(cb) {
     this.log("setUserChangeNotificationCallback(cb)");
     this._changecb = cb;
 }
 
-WymEtherpad.prototype.prepareUserChangeset = function()
-{
+WymEtherpad.prototype.prepareUserChangeset = function() {
     this.log("E: prepareUserChangeset()");
     changeset = this._doc.generateChangeset();
-    if (!changeset)
-      return null;
     payload = {
       changeset: changeset,
       apool: {
@@ -153,24 +138,20 @@ WymEtherpad.prototype.prepareUserChangeset = function()
     return payload;
 }
 
-WymEtherpad.prototype.applyChangesToBase = function(changeset, author, apool)
-{
+WymEtherpad.prototype.applyChangesToBase = function(changeset, author, apool) {
     this.log("applyChangesToBase(" + changeset + ", " + author + ", " + JSON.stringify(apool) + ")");
     this._doc.applyChangeset(changeset, apool);
 }
 
-WymEtherpad.prototype.applyPreparedChangesetToBase = function()
-{
+WymEtherpad.prototype.applyPreparedChangesetToBase = function() {
     this.log("applyPreparedChangesetToBase()");
 }
 
-WymEtherpad.prototype.setAuthorInfo = function(userId, userInfo)
-{
+WymEtherpad.prototype.setAuthorInfo = function(userId, userInfo) {
     this.log("setAuthorInfo(" + userId + ", " + JSON.stringify(userInfo) + ")");
 }
 
-WymEtherpad.prototype.getUnhandledErrors = function()
-{
+WymEtherpad.prototype.getUnhandledErrors = function() {
     this.log("E: getUnhandledErrors()");
     return [];
 }
@@ -178,41 +159,47 @@ WymEtherpad.prototype.getUnhandledErrors = function()
 
 //BEGIN CollabClient callbacks
 
-WymEtherpad.prototype.onUserJoin = function(userInfo)
-{
-    this.log("onUserJoin(" + JSON.stringify(userInfo) + ")"); }
-
-WymEtherpad.prototype.onUserLeave = function(userInfo)
-{
-    this.log("onUserLeave(" + JSON.stringify(userInfo) + ")");
+WymEtherpad.prototype.onUserJoin = function(userInfo) {
+  this.log("onUserJoin(" + JSON.stringify(userInfo) + ")"); 
+  this._callbacks.refreshUsers();
 }
 
-WymEtherpad.prototype.onUpdateUserInfo = function(userInfo)
-{
-    this.log("onUpdateUserInfo(" + JSON.stringify(userInfo) + ")");
+WymEtherpad.prototype.onUserLeave = function(userInfo) {
+  this.log("onUserLeave(" + JSON.stringify(userInfo) + ")");
+  this._callbacks.refreshUsers();
 }
 
-WymEtherpad.prototype.onChannelStateChange = function(channelState,	moreInfo)
-{
-    this.log("onChannelStateChange(" + channelState + ", " + moreInfo + ")");
+WymEtherpad.prototype.onUpdateUserInfo = function(userInfo) {
+  this.log("onUpdateUserInfo(" + JSON.stringify(userInfo) + ")");
+  this._callbacks.refreshUsers();
 }
 
-WymEtherpad.prototype.onClientMessage = function(payload)
-{
-    this.log("onClientMessage(" + JSON.stringify(payload) + ")");
+WymEtherpad.prototype.onChannelStateChange = function(channelState,	moreInfo) {
+  this.log("onChannelStateChange(" + channelState + ", " + moreInfo + ")");
 }
 
-WymEtherpad.prototype.onInternalAction = function(str)
-{
+WymEtherpad.prototype.onClientMessage = function(payload) {
+  this.log("onClientMessage(" + JSON.stringify(payload) + ")");
+
+  if (!this._initialized && payload.type == "padoptions") {
+    if (this._client.getConnectedUsers().length == 1 && this._options.initialText) {
+      this._callbacks.html(this._options.initialText);
+      this._initialized = true;
+      this._changecb();
+    } 
+    this.status("Connected");
+  }
+
+}
+
+WymEtherpad.prototype.onInternalAction = function(str) {
     this.log("onInternalAction(" + str + ")");
 }
 
-WymEtherpad.prototype.onConnectionTrouble = function(str)
-{
+WymEtherpad.prototype.onConnectionTrouble = function(str) {
     this.log("onConnectionTrouble(" + str + ")");
 }
 
-WymEtherpad.prototype.onServerMessage = function(payload)
-{
+WymEtherpad.prototype.onServerMessage = function(payload) {
     this.log("onServerMessage(" + JSON.stringify(payload) + ")");
 }

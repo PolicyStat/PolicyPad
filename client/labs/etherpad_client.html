@@ -31,6 +31,7 @@
 <script type="text/javascript" src="../policypad.js"></script>
 <script type="text/javascript" src="../etherpaddocument.js"></script>
 <script type="text/javascript" src="../wymetherpad.js"></script>
+<script type="text/javascript" src="../wymetherpadgui.js"></script>
 <script type="text/javascript" src="../etherpadplugin.js"></script>
 
 <script type="text/javascript">
@@ -73,8 +74,8 @@ jQuery(function() {
       },{
         //Options
         padId: $_GET["padId"],
+        initialText: "<p>Initial text</p>",
         funcLog: debug_log,
-        funcStatus: function(msg) { return wym.status(msg); },
         host: window.location.host,
       });
     }
@@ -94,7 +95,7 @@ function initialize()
 
 function btnRefresh_onclick() {
     var wym = jQuery.wymeditors(0);
-    wym._etherpad.submitChanges();
+    wym._etherpadGui.submitChanges();
     
 }
 
