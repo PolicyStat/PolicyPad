@@ -40,7 +40,6 @@ EtherpadDocument.prototype.generateChangeset = function() {
   var changeset = generateChangeset(this._prevHtml, this._func());
   this._prevHtml = this._func();
   return changeset;
-  //return "Z:d>1=1*0+1$a";//TODO: Use real changset
 }
 
 EtherpadDocument.prototype.applyChangeset = function(changeset, apool) {
@@ -58,3 +57,8 @@ EtherpadDocument.prototype.applyChangeset = function(changeset, apool) {
   this._prevHtml = newhtml;
   return;
 }
+
+EtherpadDocument.prototype.isModified = function() {
+  return this._prevHtml != this._func();
+}
+

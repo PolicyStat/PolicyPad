@@ -61,6 +61,10 @@ WymEtherpad.prototype.init = function() {
 //BEGIN public interface
 
 WymEtherpad.prototype.submitChanges = function() {
+  if (!this._doc.isModified()) {
+    this.log("Key event ignored");
+    return;
+  }
   this.log("Key event");
   if (!this._changecb)
     return;
@@ -136,8 +140,11 @@ WymEtherpad.prototype.setUserChangeNotificationCallback = function(cb)
 WymEtherpad.prototype.prepareUserChangeset = function()
 {
     this.log("E: prepareUserChangeset()");
+    changeset = this._doc.generateChangeset();
+    if (!changeset)
+      return null;
     payload = {
-      changeset: this._doc.generateChangeset(),
+      changeset: changeset,
       apool: {
               numToAttrib: {0: ["author", this._clientVars.userId]},
               nextNum: 1} //TODO: populate with real data
