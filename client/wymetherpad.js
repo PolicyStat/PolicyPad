@@ -89,18 +89,28 @@ WymEtherpad.prototype.status = function(msg) {
   this._callbacks.status(msg);
 }
 
-WymEtherpad.prototype.getPadValues = function(host, padName, callback) {
+WymEtherpad.prototype.getPadValues = function(host, padId, cb) {
   var etherpad = this;
 
-  var url = 'http://' + host + '/' + padName;
-  $.get(url, function(data) {
-    var clientJson = data.match(/var (clientVars = .*;)/)[1];
-    etherpad.log("Retrieved data: " + clientJson);
-    //FIXME: using eval here is bad, but issues with JSON.parse prevent this
-    //from working...
-    eval(clientJson);
-    callback(clientVars);
-  });
+  var url = 'http://' + host + '/' + padId;
+
+  parsePad = function(create) { 
+    return function(data) {
+      var clientJson = data.match(/var (clientVars = .*;)/)[1];
+      etherpad.log("Retrieved data: " + clientJson);
+      //FIXME: using eval here is bad, but issues with JSON.parse prevent this
+      //from working...
+      eval(clientJson);
+      if (create && (!clientVars || !clientVars.collab_client_vars)) {
+        var url = 'http://' + host + '/ep/pad/create';
+        $.post(url, {'padId': padId}, parsePad(false));
+      } else {
+        cb(clientVars);
+      }
+    }
+  }
+
+  $.get(url, parsePad(true));
 }
 
 //BEGIN Ace2Editor interface
