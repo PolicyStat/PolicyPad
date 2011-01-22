@@ -16,7 +16,7 @@
 
 
 /**
- * These test deal with generating changesets based in user 
+ * These tests deal with generating changesets based in user 
  * insertions in the editor.
  */
 module('Changeset Generation - Insertion');
