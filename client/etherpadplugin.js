@@ -26,42 +26,10 @@ status(string) => void - display text in editor's status bar
 //Extend WYMeditor
 WYMeditor.editor.prototype.etherpad = function(guioptions, options) {
   var wym = this;
-  var etherpad = new WymEtherpad(options, this);
-  this._etherpad = etherpad;
 
-  //create the GUI
-  var initial_options = {
-    //sUrl:          wym._options.basePath + "plugins/tidy/tidy.php",
-    sButtonHtml:     "<li class='wym_tools_strong'>"
-                     + "<a name='AboutEtherpad' href='#'"
-                     //+ " style='background-image:"
-                     //+ " url(" + wym._options.basePath + "plugins/tidy/wand.png)'>"
-                     + ">"
-                     + "About Etherpad"
-                     + "</a></li>",
-    sButtonSelector: "li.wym_tools_strong a"
-  };
-  guioptions = jQuery.extend(initial_options, guioptions);
+  var etherpadGui = new WymEtherpadGUI(guioptions, options, this);
+  this._etherpadGui = etherpadGui;
 
-  //Add button to toolbar
-  jQuery(this._box).find(this._options.toolsSelector + this._options.toolsListSelector).append(guioptions.sButtonHtml);
-
-  //handle click event
-  jQuery(this._box).find(guioptions.sButtonSelector).click(function() {
-    etherpad.testGuiEvent();
-    return(false);
-  });
-  
-  //register keyup handler
-  jQuery(this._doc).bind("keyup", function(evt) { etherpad.submitChanges(); });
-  
-  //example code
-  // jQuery(this._box).find(this._options.toolSelector).hover(
-  //     function() { wym.status('hover'); },
-  //     function() { wym.status('hi'); }
-  // );
-
-  etherpad.init();
-  return etherpad;
+  return etherpadGui;
 };
 
