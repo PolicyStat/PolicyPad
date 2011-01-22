@@ -26,6 +26,7 @@ test('single line insertions', function() {
     equals(generateChangeset('fo', 'foo'), 'Z:2>1=2*0+1$o', 'fo/foo');
     equals(generateChangeset('foo', 'foobarfoobarfoobarfoobarfoobarfoobarfoobarfoo'), 'Z:3>16=3*0+16$barfoobarfoobarfoobarfoobarfoobarfoobarfoo', 'foo/foobarfoobarfoobarfoobarfoobarfoobarfoobarfoo');
     equals(generateChangeset('foobaz', 'foobarbaz'), 'Z:6>3=5*0+3$rba', 'foobaz/foobarbaz');
+    equals(generateChangeset('', '<p>&nbsp;</p>'), 'Z:0>d*0+d$<p>&nbsp;</p>', '(empty)/<p>&nbsp</p>');
 });
 
 test('multiline insertions', function() {

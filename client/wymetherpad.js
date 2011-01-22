@@ -124,9 +124,9 @@ WymEtherpad.prototype.setBaseAttributedText = function(initialText, apool) {
 
   this.log("setBaseAttributedText(" + JSON.stringify(initialText) + ", " + JSON.stringify(apool) + ")");
   this._callbacks.html(initialText.text);
-  
+
   //Create our document wrapper around this._etherpad.html to track changes
-  this._doc = new EtherpadDocument(function(val){ return etherpad._callbacks.html(val) });
+  this._doc = new EtherpadDocument(function(val){ return etherpad._callbacks.html(val) }, initialText);
   this.status("Waiting for user listing...");
 }
 

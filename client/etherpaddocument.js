@@ -24,14 +24,14 @@
  * called with a parameter, the html value should be set, and when the 
  * parameter is omitted, the current html value is returned
  */
-function EtherpadDocument(func) {
+function EtherpadDocument(func, initialText) {
   this._func = func;
   //TODO: This class needs to track more than just HTML. In Etherpad, the text
   //consists of both the text and the mapping of text to attributes.  Etherpad
   //also tracks an attribute pool (apool) which provides formatting information,
   //but more importantly, authorship information.  Changeset manipulation needs
   //to manipulate both the text and the text/apool mappings.
-  this._prevHtml = this._func();
+  this._prevHtml = initialText.text;
 }
 
 EtherpadDocument.prototype.generateChangeset = function() {

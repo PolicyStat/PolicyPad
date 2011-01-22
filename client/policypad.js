@@ -304,7 +304,8 @@ function generateChangeset(oldText, newText) {
         result += ins > 0 ? '*0+' + packNum(ins) : '';                         // 
     });
 
-    result += pot.length > 0 ? '$' + pot : '';
+    result += '$';
+    result += pot.length > 0 ? pot : '';
 
     return result;
 }
