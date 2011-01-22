@@ -1,0 +1,47 @@
+<html>
+<head>
+  <title> PolicyPad mergeChangeset Test generator </title>
+  
+  <script type="text/javascript" src="../jquery.js"></script>
+  <script type="text/javascript" src="../policypad.js"></script>
+
+  <script type="text/javascript">
+
+    function myfunc(form) {
+    var before = form.txt1_1.value;
+    var after = form.txt1_2.value;
+    var cs1 = generateChangeset(before, after);
+
+    var before = form.txt2_1.value;
+    var after = form.txt2_2.value;
+    var cs2 = generateChangeset(before, after);
+    
+    var before = form.txt3_1.value;
+    var after = form.txt3_2.value;
+    var cs3 = generateChangeset(before, after);
+    
+    var out_txt = "equals(mergeChangeset('" + cs1 + "', '"+ cs2+"'), '"+ cs3 +"', '"+before+"/"+after+"');";
+
+    form.txt_out.value = out_txt;
+    }
+
+
+
+  </script>
+</head>
+
+<body>
+  <h1> PolicyPad mergeChangeset Test generator </h1>
+  <p> Upon being requested to write unit tests for mergeChangeset, it came to mind that there might be several correct answers. Therefore, I chose to create this generator, which ensures that mergeChangeset unit tests will be written in the way that generateChangeset would create them. It does this by using generateChangeset directly, so in order for these unit test to be valid, generateChangeset's unit tests MUST pass. </p>
+
+  <p> Usage: </p>
+
+  <form name="change1">
+    <input type="text" name="txt1_1"><input type="text" name="txt1_2"><br>
+    <input type="text" name="txt2_1"><input type="text" name="txt2_2"><br>
+    <input type="text" name="txt3_1"><input type="text" name="txt3_2"><br>
+    <input type="button" name="submit" value="Generate" onclick="myfunc(this.form)"><br>
+    <textarea name="txt_out" cols="80" rows="20"></textarea>
+  </form>
+
+</body>
