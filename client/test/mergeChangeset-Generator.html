@@ -7,41 +7,68 @@
 
   <script type="text/javascript">
 
-    function myfunc(form) {
-    var before = form.txt1_1.value;
-    var after = form.txt1_2.value;
-    var cs1 = generateChangeset(before, after);
+    function generateCustom(form) {
+    var original = form.txt1_1.value;
+    var mod1 = form.txt1_2.value;
+    var mod2 = form.txt2_2.value;
+    var mod = form.txt3_2.value;
 
-    var before = form.txt2_1.value;
-    var after = form.txt2_2.value;
-    var cs2 = generateChangeset(before, after);
-    
-    var before = form.txt3_1.value;
-    var after = form.txt3_2.value;
-    var cs3 = generateChangeset(before, after);
-    
-    var out_txt = "equals(mergeChangeset('" + cs1 + "', '"+ cs2+"'), '"+ cs3 +"', '"+before+"/"+after+"');";
-
-    form.txt_out.value = out_txt;
+    form.txt_out.value = generateUnitTest(original, mod1, mod2, mod);
     }
 
 
+    function generatePredefined(form) {
+    var tests = [
+    ['jacob', 'jcob', 'jacb', 'jcb'],
+    ['kvn', 'kevn', 'kvin', 'kevin'],
+    ];
+
+
+    var txt = [];
+    for (i=0; i<tests.length; i++) {
+	   txt[i] = generateUnitTest(tests[i][0], tests[i][1], tests[i][2], tests[i][3]);
+  }
+
+form.txt_out.value = txt.join('\n');
+    }
+
+
+    function generateUnitTest(old, new1, new2, newcombined) {
+    var cs1 = generateChangeset(old, new1);
+    var cs2 = generateChangeset(old, new2);
+    var cs3 = generateChangeset(old, newcombined);
+
+    return "equals(mergeChangeset('" + cs1 + "', '"+ cs2+"'), '"+ cs3 +"', '"+old+"/"+newcombined+"');";
+    }
 
   </script>
 </head>
 
 <body>
   <h1> PolicyPad mergeChangeset Test generator </h1>
-  <p> Upon being requested to write unit tests for mergeChangeset, it came to mind that there might be several correct answers. Therefore, I chose to create this generator, which ensures that mergeChangeset unit tests will be written in the way that generateChangeset would create them. It does this by using generateChangeset directly, so in order for these unit test to be valid, generateChangeset's unit tests MUST pass. </p>
+  <p> Upon being requested to write unit tests for mergeChangeset,
+ it came to mind that there might be several correct answers.
+ Therefore, I chose to create this generator, 
+which ensures that mergeChangeset unit tests will be written in the way
+ that generateChangeset would create them. It does this by using generateChangeset directly,
+ so in order for these unit tests to be valid, generateChangeset's unit tests MUST pass. </p>
 
-  <p> Usage: </p>
+  <p> Usage: Enter in the four boxes this information...<br>
+Original text<br>
+Original text + one change<br>
+Original text + different change<br>
+Original text + combined changes<br></p>
+
+<p> You may also hit the 'Generate Predefined' button to get the hard-coded list </p>
 
   <form name="change1">
-    <input type="text" name="txt1_1"><input type="text" name="txt1_2"><br>
-    <input type="text" name="txt2_1"><input type="text" name="txt2_2"><br>
-    <input type="text" name="txt3_1"><input type="text" name="txt3_2"><br>
-    <input type="button" name="submit" value="Generate" onclick="myfunc(this.form)"><br>
-    <textarea name="txt_out" cols="80" rows="20"></textarea>
+    Original: <input type="text" name="txt1_1"><br><br>
+    Change1:  <input type="text" name="txt1_2"><br>
+    Change2:  <input type="text" name="txt2_2"><br>
+    Combined: <input type="text" name="txt3_2"><br>
+    <input type="button" value="Generate" onclick="generateCustom(this.form)"><br>
+    <input type="button" value="Generate Predefined" onclick="generatePredefined(this.form)"><br>
+    Generated Test: <br><textarea name="txt_out" cols="120" rows="20"></textarea>
   </form>
 
 </body>
