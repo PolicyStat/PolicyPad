@@ -28,12 +28,12 @@
  */
 
 function getQueryParams(qs) {
-    qs = qs.split("+").join(" ");
+    qs = qs.substring(1).split("+").join(" ");
     var params = {};
-    var tokens;
-
-    while (tokens = /[?&]?([^=]+)=([^&]*)/g.exec(qs)) {
-        params[decodeURIComponent(tokens[1])] = decodeURIComponent(tokens[2]);
+    var vars = qs.split("&");
+    for (var i = 0; i < vars.length; i++) {
+      var pair = vars[i].split("=");
+      params[pair[0]] = pair[1];
     }
     return params;
 }
