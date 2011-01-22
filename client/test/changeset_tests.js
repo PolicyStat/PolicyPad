@@ -42,6 +42,6 @@ test('multiline insertions', function() {
 module('Changeset Generation - Deletion');
 
 test('single line deletions', function() {
-    equals(generateChangeset('fooo', 'foo'), 'Z:4<1=3-1', 'foooo/foo');
-    equals(generateChangeset('foobarbaz', 'foobaz'), 'Z:9<3=5-3', 'foobarbaz/foobaz');
+    equals(generateChangeset('fooo', 'foo'), 'Z:4<1=3-1$', 'foooo/foo');
+    equals(generateChangeset('foobarbaz', 'foobaz'), 'Z:9<3=5-3$', 'foobarbaz/foobaz');
 });
