@@ -74,7 +74,12 @@ function genUTFromGenerate(old, new1, new2, newcombined) {
 }
 
 function genUTFromApply(old, new1, new2, newcombined) {
-    alert('Function Not yet implemented!');
+//    equals(applyChangeset(old, mergeChangeset(cs1, cs2)), newcombined, "old/new");
+    var result = [];
+    var cs1 = generateChangeset(old, new1);
+    var cs2 = generateChangeset(old, new2);
+
+    return "equals(applyChangeset('"+old+"', mergeChangeset('"+cs1+"', '"+cs2+"')), '"+newcombined+"', '"+old+"/"+newcombined+"');";
 }
 
 
