@@ -19,6 +19,17 @@ function WymEtherpadGUI(guioptions, options, wym) {
   };
   this._options = jQuery.extend(initial_options, guioptions);
 
+  //check when certain events happen in wymeditor 
+  // var wrapMsg = function(msg, func) {
+  //   return function() {
+  //     alert(msg);
+  //     return func.apply(this, arguments);
+  //   };
+  // };
+  // wym.update = wrapMsg("update accessed", wym.update);
+  // wym.wrap = wrapMsg("Wrap accessed", wym.wrap);
+  // wym.unwrap = wrapMsg("unwrap accessed", wym.unwrap);
+
   //Add button to toolbar
   jQuery(wym._box).find(wym._options.toolsSelector + wym._options.toolsListSelector).append(this._options.sButtonHtml);
 
