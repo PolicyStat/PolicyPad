@@ -63,13 +63,11 @@ WymEtherpad.prototype.init = function() {
 //BEGIN public interface
 
 WymEtherpad.prototype.submitChanges = function() {
-  if (!this._doc.isModified()) {
+  if (!this._changecb || this._doc.hasPendingChangeset() || !this._doc.isModified()) {
     this.log("Key event ignored");
     return;
   }
   this.log("Key event");
-  if (!this._changecb)
-    return;
   this._changecb();
 }
 
@@ -116,7 +114,7 @@ WymEtherpad.prototype.getPadValues = function(host, padId, cb) {
 //BEGIN Ace2Editor interface
 
 WymEtherpad.prototype.setProperty = function(key, val) {
-    this.log("Setting property (" + key + "): " + val);
+  this.log("Setting property (" + key + "): " + val);
 }
 
 WymEtherpad.prototype.setBaseAttributedText = function(initialText, apool) {
@@ -131,39 +129,40 @@ WymEtherpad.prototype.setBaseAttributedText = function(initialText, apool) {
 }
 
 WymEtherpad.prototype.setUserChangeNotificationCallback = function(cb) {
-    this.log("setUserChangeNotificationCallback(cb)");
-    this._changecb = cb;
+  this.log("setUserChangeNotificationCallback(cb)");
+  this._changecb = cb;
 }
 
 WymEtherpad.prototype.prepareUserChangeset = function() {
-    this.log("E: prepareUserChangeset()");
-    changeset = this._doc.generateChangeset();
-    payload = {
-      changeset: changeset,
-      apool: {
-              numToAttrib: {0: ["author", this._clientVars.userId]},
-              nextNum: 1} //TODO: populate with real data
-    };
-    this.log(JSON.stringify(payload))
-    return payload;
+  this.log("E: prepareUserChangeset()");
+  changeset = this._doc.generateChangeset();
+  payload = {
+    changeset: changeset,
+    apool: {
+            numToAttrib: {0: ["author", this._clientVars.userId]},
+            nextNum: 1} //TODO: populate with real data
+  };
+  this.log(JSON.stringify(payload))
+  return payload;
 }
 
 WymEtherpad.prototype.applyChangesToBase = function(changeset, author, apool) {
-    this.log("applyChangesToBase(" + changeset + ", " + author + ", " + JSON.stringify(apool) + ")");
-    this._doc.applyChangeset(changeset, apool);
+  this.log("applyChangesToBase(" + changeset + ", " + author + ", " + JSON.stringify(apool) + ")");
+  this._doc.applyChangeset(changeset, apool);
 }
 
 WymEtherpad.prototype.applyPreparedChangesetToBase = function() {
-    this.log("applyPreparedChangesetToBase()");
+  this.log("applyPreparedChangesetToBase()");
+  this._doc.changesetAccepted();
 }
 
 WymEtherpad.prototype.setAuthorInfo = function(userId, userInfo) {
-    this.log("setAuthorInfo(" + userId + ", " + JSON.stringify(userInfo) + ")");
+  this.log("setAuthorInfo(" + userId + ", " + JSON.stringify(userInfo) + ")");
 }
 
 WymEtherpad.prototype.getUnhandledErrors = function() {
-    this.log("E: getUnhandledErrors()");
-    return [];
+  this.log("E: getUnhandledErrors()");
+  return [];
 }
 //END Ace2Editor interface
 
@@ -195,7 +194,7 @@ WymEtherpad.prototype.onClientMessage = function(payload) {
     if (this._client.getConnectedUsers().length == 1 && this._options.initialText) {
       this._callbacks.html(this._options.initialText);
       this._initialized = true;
-      this._changecb();
+      this.submitChanges();
     } 
     this.status("Connected");
   }
@@ -203,15 +202,17 @@ WymEtherpad.prototype.onClientMessage = function(payload) {
 }
 
 WymEtherpad.prototype.onInternalAction = function(str) {
-    this.log("onInternalAction(" + str + ")");
+  this.log("onInternalAction(" + str + ")");
 }
 
 WymEtherpad.prototype.onConnectionTrouble = function(str) {
-    this.log("onConnectionTrouble(" + str + ")");
+  this.log("onConnectionTrouble(" + str + ")");
 }
 
 WymEtherpad.prototype.onServerMessage = function(payload) {
-    this.log("onServerMessage(" + JSON.stringify(payload) + ")");
-    //onServerMessage({"type":"NOTICE","js":"","text":"I am you administrator!"})
-    //server wants us to eval js, HAH!
+  this.log("onServerMessage(" + JSON.stringify(payload) + ")");
+  this.status("Broadcast message from server: " + payload.text);
+  //onServerMessage({"type":"NOTICE","js":"","text":"I am you administrator!"})
+  //server wants us to eval js, HAH!
 }
+

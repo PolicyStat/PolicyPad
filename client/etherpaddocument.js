@@ -32,14 +32,14 @@ function EtherpadDocument(func, initialText) {
   //but more importantly, authorship information.  Changeset manipulation needs
   //to manipulate both the text and the text/apool mappings.
   this._prevHtml = initialText.text;
+  this._pendingChangeset = null;
 }
 
 EtherpadDocument.prototype.generateChangeset = function() {
-  if (this._prevHtml == this._func())
+  if (this._pendingChangeset || this._prevHtml == this._func())
     return null;
-  var changeset = generateChangeset(this._prevHtml, this._func());
-  this._prevHtml = this._func();
-  return changeset;
+  this._pendingChangeset = generateChangeset(this._prevHtml, this._func());
+  return this._pendingChangeset;
 }
 
 EtherpadDocument.prototype.applyChangeset = function(changeset, apool) {
@@ -56,6 +56,15 @@ EtherpadDocument.prototype.applyChangeset = function(changeset, apool) {
   this._func(newhtml);
   this._prevHtml = newhtml;
   return;
+}
+
+EtherpadDocument.prototype.hasPendingChangeset = function() {
+  return this._pendingChangeset != null;
+}
+
+EtherpadDocument.prototype.changesetAccepted = function() {
+  this._prevHtml = applyChangeset(this._prevHtml, this._pendingChangeset);
+  this._pendingChangeset = null;
 }
 
 EtherpadDocument.prototype.isModified = function() {
