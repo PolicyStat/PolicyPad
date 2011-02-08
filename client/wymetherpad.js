@@ -212,4 +212,6 @@ WymEtherpad.prototype.onConnectionTrouble = function(str) {
 
 WymEtherpad.prototype.onServerMessage = function(payload) {
     this.log("onServerMessage(" + JSON.stringify(payload) + ")");
+    //onServerMessage({"type":"NOTICE","js":"","text":"I am you administrator!"})
+    //server wants us to eval js, HAH!
 }
