@@ -19,21 +19,30 @@
  * These tests deal with generating changesets based in user 
  * insertions in the editor.
  */
+
+function changesetTest(original, result, comment) {
+    equals(applyChangeset(original, generateChangeset(original, result)), result, comment);
+}
+
 module('Changeset Generation - Insertion');
 
-test('single line insertions', function() {
-    equals(generateChangeset('foobar', 'foobarbaz'), 'Z:6>3=6*0+3$baz', 'foobar/foobarbaz');
-    equals(generateChangeset('fo', 'foo'), 'Z:2>1=2*0+1$o', 'fo/foo');
-    equals(generateChangeset('foo', 'foobarfoobarfoobarfoobarfoobarfoobarfoobarfoo'), 'Z:3>16=3*0+16$barfoobarfoobarfoobarfoobarfoobarfoobarfoo', 'foo/foobarfoobarfoobarfoobarfoobarfoobarfoobarfoo');
-    equals(generateChangeset('foobaz', 'foobarbaz'), 'Z:6>3=5*0+3$rba', 'foobaz/foobarbaz');
-    equals(generateChangeset('', '<p>&nbsp;</p>'), 'Z:0>d*0+d$<p>&nbsp;</p>', '(empty)/<p>&nbsp</p>');
+test('simple insertion', function() {
+    changesetTest('foo', 'foo', 'Identity (no change)');
+    changesetTest('fo', 'foo', 'Single letter append');
+    changesetTest('foo', 'foobar', 'Three letter append');
+    changesetTest('barbaz', 'foobarbaz', 'Insert at beginning');
+    changesetTest('foobaz', 'foobarbaz', 'Three letter insert to center');
+    changesetTest('foo', 'foobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobar', 'Many letter append');
+    changesetTest('', 'foobar', 'Empty string append');
 });
 
-test('multiline insertions', function() {
-    equals(generateChangeset('foo\n', 'foo\nbar'), 'Z:4>3|1=4*0+3$bar', 'foo\n/foo\nbar');
-    equals(generateChangeset('foo\nbar', 'foo\nbar\nbaz'), 'Z:7>4|1=4=3*0|1+1*0+3$\nbaz', 'foo\nbar/foo\nbar\nbaz');
-    equals(generateChangeset('foo\nbaz', 'foo\nbar\nbaz'), 'Z:7>4|1=4=2*0|1+2*0+2$r\nba', 'foo\nbaz/foo\nbar\nbaz');
+test('HTML-specific insertion', function() {
+    changesetTest('<br />', '<p>Hello world!</p>', 'Paragraph insert from empty');
+    changesetTest('<p>Hello world!</p><p>Goodbye world!</p>', '<p>Hello world!</p><p>This is a test.</p><p>Goodbye world!</p>', 'Paragraph insert mid-document');
+    changesetTest('<br />', '<table summary="Just another table"><caption>A new table</caption><tbody><tr><td></td><td></td></tr><tr><td></td><td></td></tr><tr><td></td><td></td></tr></tbody></table>', 'Table insert from empty');
+    changesetTest('<table summary="Just another table"><caption>A new table</caption><tbody><tr><td></td><td></td></tr><tr><td></td><td></td></tr><tr><td></td><td></td></tr></tbody></table>', '<table summary="Just another table"><caption>A new table</caption><tbody><tr><td>one</td><td>two</td></tr><tr><td>three</td><td>four</td></tr><tr><td>five</td><td>six</td></tr></tbody></table>', 'Populate table with values');
 });
+
 
 /**
  * These tests deal with generating changesets based on deletions
@@ -41,7 +50,32 @@ test('multiline insertions', function() {
  */
 module('Changeset Generation - Deletion');
 
-test('single line deletions', function() {
-    equals(generateChangeset('fooo', 'foo'), 'Z:4<1=3-1$', 'foooo/foo');
-    equals(generateChangeset('foobarbaz', 'foobaz'), 'Z:9<3=5-3$', 'foobarbaz/foobaz');
+test('simple deletion', function() {
+    changesetTest('foobar', 'foo', 'Deletion from end');
+    changesetTest('foobarbaz', 'fooz', 'Deletion from center');
+    changesetTest('foobarbaz', 'barbaz', 'Deletion from beginning');
+});
+
+test('HTML-specific deletion', function() {
+    changesetTest('<p>Hello, World!</p>', '<p>Hello!</p>', 'Simple deletion');
+    changesetTest('<p>Hello!</p><p>World!</p><p>Foobar</p>', '<p>Hello!</p><p>Foobar</p>', 'Tag deletion');
+});
+
+/**
+ * These tests deal with generating changesets based on a combination
+ * of insertions and deletions
+ */
+module('Changeset Generation - Alter Text');
+
+test('simple change', function() {
+    changesetTest('foobar', 'foobaz', 'One letter replacement');
+    changesetTest('foobar', 'zzzbar', 'Consecutive letter replacement');
+    changesetTest('foobar', 'foozzz', 'Consecutive letter replacment (end)');
+    changesetTest('foobar', 'fooaaaabbbbb', 'Letter replacement and append');
+    changesetTest('foobar', 'abcdefghijklmnopqrstuvwxyz', 'Complete replacment with total growth');
+});
+
+test('HTML-specific change', function() {
+    changesetTest('<p>Hello world!</p>', '<p>Hello there!</p>', 'Replacement within tag');
+    changesetTest('<p>Hello!</p><p>World!</p>', '<p>Hello!</p><p>There!</p><p>How are you?</p>', 'Change and append');
 });
