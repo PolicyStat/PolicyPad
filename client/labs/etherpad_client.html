@@ -17,6 +17,12 @@
 <script type="text/javascript" src="../wymetherpadgui.js"></script>
 <script type="text/javascript" src="../etherpadplugin.js"></script>
 
+<!--
+<link type="text/css" href="css/themename/jquery-ui-1.8.9.custom.css" rel="Stylesheet" />	
+<script type="text/javascript" src="js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.8.9.custom.min.js"></script>
+-->
+
 <script type="text/javascript">
 
 /* Here we replace each element with class 'wymeditor'
@@ -94,6 +100,9 @@ function btnRefresh_onclick() {
 <form method="post" action="">
 <textarea class="wymeditor">Loading...</textarea>
 <!--input type="submit" class="wymupdate" /-->
+<p> Connected Users: </p>
+<textarea id="userlist" rows="10" cols="40" value="Hello" readonly="true" class="wym_skin_default"></textarea>
+<br>
 <input type="button" name="btnRefresh" value="Refresh" onclick="btnRefresh_onclick()" />
 </form>
     

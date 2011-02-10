@@ -124,7 +124,13 @@ WymEtherpadGUI.prototype.html = function(val) {
 }
 
 WymEtherpadGUI.prototype.refreshUsers = function() {
-    alert(JSON.stringify(this.etherpad.getUserList()));
+    var msg = "";
+    var i;
+    var users = this._etherpad.getUserList();
+    for (i=0; i<users.length; i++) {
+    	msg = msg + users[i].name + '\n';
+    }
+    $('#userlist').text(msg);
 }
 
 //END WymEtherpadCallbacks interface
