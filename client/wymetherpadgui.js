@@ -124,7 +124,7 @@ WymEtherpadGUI.prototype.html = function(val) {
 }
 
 WymEtherpadGUI.prototype.refreshUsers = function() {
-  //TODO: implement
+    alert(JSON.stringify(this.etherpad.getUserList()));
 }
 
 //END WymEtherpadCallbacks interface

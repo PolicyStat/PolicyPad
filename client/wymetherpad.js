@@ -51,7 +51,7 @@ WymEtherpad.prototype.init = function() {
     etherpad._client.setOnUserJoin(          function(userInfo)               {etherpad.onUserJoin(userInfo);});
     etherpad._client.setOnUserLeave(         function(userInfo)               {etherpad.onUserLeave(userInfo);});
     etherpad._client.setOnUpdateUserInfo(    function(userInfo)               {etherpad.onUpdateUserInfo(userInfo);});
-    etherpad._client.setOnChannelStateChange(function(channelState,	moreInfo) {etherpad.onChannelStateChange(channelState,	moreInfo);});
+    etherpad._client.setOnChannelStateChange(function(channelState, moreInfo) {etherpad.onChannelStateChange(channelState,	moreInfo);});
     etherpad._client.setOnClientMessage(     function(payload)                {etherpad.onClientMessage(payload);});
     etherpad._client.setOnInternalAction(    function(str)                    {etherpad.onInternalAction(str);});
     etherpad._client.setOnConnectionTrouble( function(str)                    {etherpad.onConnectionTrouble(str);});
@@ -73,6 +73,10 @@ WymEtherpad.prototype.submitChanges = function() {
 
 WymEtherpad.prototype.testGuiEvent = function() {
   this.log("You clicked on the toolbar");
+};
+
+WymEtherpad.prototype.getUserList = function() {
+  return this._client.getConnectedUsers();
 };
 
 //BEGIN 'private' methods
@@ -170,7 +174,7 @@ WymEtherpad.prototype.getUnhandledErrors = function() {
 
 WymEtherpad.prototype.onUserJoin = function(userInfo) {
   this.log("onUserJoin(" + JSON.stringify(userInfo) + ")"); 
-  this._callbacks.refreshUsers();
+    this._callbacks.refreshUsers();
 }
 
 WymEtherpad.prototype.onUserLeave = function(userInfo) {
