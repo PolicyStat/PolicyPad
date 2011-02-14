@@ -217,7 +217,7 @@ function generateChangeset(o,n){
                 }
                 currentText = (start ? '' : " ") + out.n[i].text + (i >= nSpace.length ? '' : nSpace[i]);
                 start = false;
-                str += _newlines(currentText) + '=' + packNum(currentText.length) + pre;
+                str += pre == '' ? '' : (_newlines(currentText) + '=' + packNum(currentText.length) + pre);
             }
         }
     }
