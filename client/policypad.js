@@ -122,7 +122,8 @@ function applyChangeset(oldText, changeset) {
   res += oldText.substring(i);
 
   if (res.length != newlen) {
-    alert('final lengths do not match. changeset: [' + trueChangeset + '] actual: ' + res.length + ' reported: ' + newlen);
+    alert(res);
+    //alert('final lengths do not match. changeset: [' + trueChangeset + '] actual: ' + res.length + ' reported: ' + newlen);
     return null;
   }
 
@@ -168,6 +169,7 @@ function _newlines(t) {
 }
 
 function generateChangeset(o,n){
+    log("Generating Changeset: Old: [" + o + "] New: [" + n + "]");
     var packNum = function(num) { return num.toString(36).toLowerCase(); };
     var out = _diff(o == '' ? [] : o.split(/\s+/), n== '' ? [] : n.split(/\s+/));
     var str = 'Z:' + packNum(o.length);
