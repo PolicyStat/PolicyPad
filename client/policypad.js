@@ -130,7 +130,7 @@ function applyChangeset(oldText, changeset) {
 function generateChangeset(o,n){
 
     function _newlines(t) {
-        var newlines = t.match(/\n/);
+        var newlines = t.match(/\n/g);
         if (newlines == null) {
             return "";
         }
