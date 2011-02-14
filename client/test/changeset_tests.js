@@ -78,4 +78,5 @@ test('simple change', function() {
 test('HTML-specific change', function() {
     changesetTest('<p>Hello world!</p>', '<p>Hello there!</p>', 'Replacement within tag');
     changesetTest('<p>Hello!</p><p>World!</p>', '<p>Hello!</p><p>There!</p><p>How are you?</p>', 'Change and append');
+    changesetTest('<p>Hello my World!</p>\n\n', '<p>Initial HTML</p>', 'Replace consecutive newlines');
 });

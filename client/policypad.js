@@ -27,11 +27,11 @@ function applyChangeset(oldText, changeset) {
   var parts = changeset.split('$');
   
   if (changeset.substring(0,2) != "Z:")  {
-      alert('11');
+      //alert('11');
       return null;
   }
   if (parts.length != 2) {
-      alert('22');
+      //alert('22');
       return null;
   }
 
@@ -43,7 +43,7 @@ function applyChangeset(oldText, changeset) {
 
   parts = changeset.match(/^(\w+)([><])(\w+)/);
   if (!parts) {
-    alert('1');
+    //alert('1');
     return null;
   }
   oldlen = convBase36(parts[1]);
@@ -57,12 +57,12 @@ function applyChangeset(oldText, changeset) {
       newlen += oldlen;
       break;
     default:
-      alert('2');
+      //alert('2');
       return null;
   }
 
   if (oldText.length != oldlen) {
-    alert('3');
+    //alert('3');
     return null;
   }
 
@@ -90,7 +90,7 @@ function applyChangeset(oldText, changeset) {
       case '=':
         change = oldText.substring(i, i + part.len);
         if (change.split('\n').length-1 != newlines) {
-          alert('Incorrect number of newlines in [' + change + ']. Reported: ' + newlines + ' Actual: ' + (change.split('\n').length - 1));
+          //alert('Incorrect number of newlines in [' + change + ']. Reported: ' + newlines + ' Actual: ' + (change.split('\n').length - 1));
           return null;
         }
         res += change;
@@ -109,7 +109,7 @@ function applyChangeset(oldText, changeset) {
         break;
       case '-':
         if (oldText.substring(i, i + part.len).split('\n').length-1 != newlines) {
-          alert('Incorrect number of newlines in [' + oldText.substring(i, i + part.len) + ']. Reported: ' + newlines + ' Actual: ' + (oldText.substring(i, i + part.len).split('\n').length - 1));
+          //alert('Incorrect number of newlines in [' + oldText.substring(i, i + part.len) + ']. Reported: ' + newlines + ' Actual: ' + (oldText.substring(i, i + part.len).split('\n').length - 1));
           return null;
         }
         i += part.len;
@@ -122,7 +122,7 @@ function applyChangeset(oldText, changeset) {
   res += oldText.substring(i);
 
   if (res.length != newlen) {
-    alert(res);
+    //alert(res);
     //alert('final lengths do not match. changeset: [' + trueChangeset + '] actual: ' + res.length + ' reported: ' + newlen);
     return null;
   }
@@ -169,7 +169,7 @@ function _newlines(t) {
 }
 
 function generateChangeset(o,n){
-    log("Generating Changeset: Old: [" + o + "] New: [" + n + "]");
+    //alert("Generating Changeset: Old: [" + o + "] New: [" + n + "]");
     var packNum = function(num) { return num.toString(36).toLowerCase(); };
     var out = _diff(o == '' ? [] : o.split(/\s+/), n== '' ? [] : n.split(/\s+/));
     var str = 'Z:' + packNum(o.length);
