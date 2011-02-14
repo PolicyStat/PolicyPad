@@ -174,6 +174,7 @@ function generateChangeset(o,n){
     var i;
     var x = null; 
     var pre;
+    var potentialStr = '';
     var currentText;
     var oSpace = o.match(/\s+/g);
     var nSpace = n.match(/\s+/g);
@@ -190,7 +191,9 @@ function generateChangeset(o,n){
     if (out.n.length==0) {
         for(i=0; i<out.o.length; i++) {
             currentText = out.o[i] + (i >= oSpace.length ? '' : oSpace[i]);
+            str += potentialStr;
             str += _newlines(currentText) + '-' + packNum(currentText.length);
+            potentialStr = '';
             start = false;
         }
     }
@@ -198,14 +201,18 @@ function generateChangeset(o,n){
         if (out.n[0].text==x) {
             for(n=0; n<out.o.length && out.o[n].text==x; n++) {
                 currentText = out.o[n] + (n >= oSpace.length ? '' : oSpace[n]);
+                str += potentialStr;
                 str += _newlines(currentText) + '-' + packNum(currentText.length);
+                potentialStr = '';
                 start = false;
             }
         }
         for (i=0; i<out.n.length; i++) {
             if (out.n[i].text==x) {
                 currentText = out.n[i] + (i >= nSpace.length ? '' : nSpace[i]);
+                str += potentialStr;
                 str += '*0' + _newlines(currentText) + '+' + packNum(currentText.length);
+                potentialStr = '';
                 pot += currentText;
                 start = false;
             }
@@ -217,7 +224,14 @@ function generateChangeset(o,n){
                 }
                 currentText = (start ? '' : " ") + out.n[i].text + (i >= nSpace.length ? '' : nSpace[i]);
                 start = false;
-                str += pre == '' ? '' : (_newlines(currentText) + '=' + packNum(currentText.length) + pre);
+                if (pre == '') {
+                    potentialStr += _newlines(currentText) + '=' + packNum(currentText.length);
+                } else {
+                    str += potentialStr;
+                    str += _newlines(currentText) + '=' + packNum(currentText.length) + pre;
+                    potentialStr = '';
+                }
+
             }
         }
     }
