@@ -58,13 +58,24 @@ function parseChangeset(changeset) {
   OpIterator.prototype.next = function() {
     if (this._lens.length == 0)
       throw StopIteration;
-    return {op: this._ops.shift(), len: convBase36(this._lens.shift())};
+    var op = this._ops.shift();
+    var len = convBase36(this._lens.shift());
+
+    if (op == '|') {
+     return {
+       op: this._ops.shift(), 
+       len: convBase36(this._lens.shift()),
+       newlines: len
+       };
+    }
+    return {op: op, len: len, newlines: 0};
   }
   OpIterator.prototype.__iterator__ = function() { return this; }
 
   var ops = new OpIterator(changeset);
 
   return {
+    prefix: "Z:" + parts[0],
     ops: ops,
     oldlen: oldlen,
     newlen: newlen,
@@ -90,34 +101,28 @@ function applyChangeset(oldText, changeset) {
 
   var i = 0;
   var attribs = [];
-  var newlines = 0;
   for (var part in parsed.ops) {
     switch (part.op) {
       case '=':
         change = oldText.substring(i, i + part.len);
-        if (change.split('\n').length-1 != newlines) {
+        if (change.split('\n').length-1 != part.newlines) {
           return null;
         }
         res += change;
         i += part.len;
-        newlines = 0;
         break;
       case '*':
         //TODO: update attribs
-        break;
-      case '|':
-        newlines = part.len;
         break;
       case '+':
         res += parsed.bank.substring(0, part.len);
         parsed.bank = parsed.bank.substring(part.len);
         break;
       case '-':
-        if (oldText.substring(i, i + part.len).split('\n').length-1 != newlines) {
+        if (oldText.substring(i, i + part.len).split('\n').length-1 != part.newlines) {
           return null;
         }
         i += part.len;
-        newlines = 0;
         break;
     }
   }
@@ -136,6 +141,49 @@ function optimizeChangeset(oldText, changeset) {
 
   parsed = parseChangeset(changeset);
 
+  optimized = parsed.prefix;
+  var append_part = function(part) {
+    var packNum = function(num) { return num.toString(36).toLowerCase(); };
+    if (part.newlines > 0)
+      optimized += "|" + packNum(part.newlines);
+    optimized += part.op + packNum(part.len);
+  }
+
+  pot = "";
+
+  var prevPart = null;
+  for (var part in parsed.ops) {
+    if (prevPart && prevPart.op == part.op) {
+      prevPart.len += part.len;
+      prevPart.newlines += part.newlines;
+    } else {
+      if (prevPart) {
+        append_part(prevPart);
+        prevPart = null;
+      }
+      switch (part.op) {
+        case '=':
+          prevPart = part;
+          break;
+        case '*':
+          prevPart = part;
+          break;
+        case '+':
+          pot += parsed.bank.substring(0, part.len);
+          parsed.bank = parsed.bank.substring(part.len);
+          prevPart = part;
+          break;
+        case '-':
+          prevPart = part;
+          break;
+      }
+    }
+  }
+
+  if (prevPart)
+    append_part(prevPart);
+
+  optimized += "$" + pot;
 
   return changeset;
 }
@@ -254,7 +302,7 @@ function generateChangeset(o,n){
             }
         }
     }
-    return optimizeChangeset(str + '$' + pot);
+    return optimizeChangeset(o, str + '$' + pot);
 }
 
 function mergeChangeset(cs1, cs2) {
