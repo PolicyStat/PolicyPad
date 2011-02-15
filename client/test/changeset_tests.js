@@ -47,6 +47,7 @@ test('HTML-specific insertion', function() {
     changesetTest('<p>a\nb\nc\nd</p>', '<p>a\nb\nc\nq\nd</p>', 'Insert new word on new line');
     changesetTest('<p>a</p>\n<p>b</p\n<p>c</p>\n', '<p>a</p>\n<p>b</p\n<p>q</p>\n<p>c</p>\n', 'Insert paragraph on new line');
     changesetTest('<p>a \n b</p>', '<p>a \nc\n b</p>', 'Insert word on new line with spaces');
+    changesetTest('<p>Hello</p>', '<p>Hello</p><p>There</p>', 'Append paragraph');
 });
 
 
