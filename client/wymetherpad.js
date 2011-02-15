@@ -22,6 +22,7 @@ function WymEtherpad(options, callbacks) {
     funcStatus: null,
     host: '',
     padId: '',
+    username: '',
     initialText: null
   };
   
@@ -42,7 +43,7 @@ WymEtherpad.prototype.init = function() {
     etherpad._clientVars = clientVars;
     userInfo = {
       userId:    clientVars.userId,
-      name:      clientVars.userName,
+      name:      this._options.username,
       ip:        clientVars.clientIp,
       colorId:   clientVars.userColor,
       userAgent: padutils.uaDisplay(clientVars.userAgent)
