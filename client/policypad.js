@@ -185,7 +185,7 @@ function optimizeChangeset(oldText, changeset) {
 
   optimized += "$" + pot;
 
-  return changeset;
+  return optimized;
 }
 
 /**
