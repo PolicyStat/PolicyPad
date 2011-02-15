@@ -241,7 +241,7 @@ function generateChangeset(o,n){
                 /* Deletions */
                 for (n=out.n[i].row+1; n<out.o.length && out.o[n].text == null; n++) {
                     currentText = out.o[n] + (n >= oSpace.length ? '' : oSpace[n]);
-                    pre += '-' + packNum(currentText.length);
+                    pre += _newlines(currentText) + '-' + packNum(currentText.length);
                 }
                 currentText = out.n[i].text + (i >= nSpace.length ? '' : nSpace[i]);
                 start = false;
