@@ -152,59 +152,95 @@ function applyChangeset(oldText, changeset) {
 
 function optimizeChangeset(oldText, changeset) {
 
-  parsed = parseChangeset(changeset);
-
-  optimized = parsed.prefix;
-  var append_part = function(part) {
+  var append_part = function(changeset, part) {
     var packNum = function(num) { return num.toString(36).toLowerCase(); };
     for (var i = 0; i < part.attribs.length; i++) {
-      optimized += "*" + part.attribs[i];
+      changeset += "*" + part.attribs[i];
     }
     if (part.newlines > 0)
-      optimized += "|" + packNum(part.newlines);
-    optimized += part.op + packNum(part.len);
+      changeset += "|" + packNum(part.newlines);
+    changeset += part.op + packNum(part.len);
+    return changeset
   };
 
   var compareAttribs = function(attribs1, attribs2) {
     attribs1 = attribs1.slice(0);
     attribs2 = attribs2.slice(0);
-
     if (attribs1.length != attribs2.length)
       return false;
-
     for (var i = 0; i < attribs1.length; i++)
       if (attribs1[i] != attribs2[i])
         return false;
-
     return true;
   };
 
-  pot = "";
-
+  //collapse the changeset removing duplicate operators
+  parsed = parseChangeset(changeset);
+  collapsed = parsed.prefix;
   var prevPart = null;
   for (var part in parsed.ops) {
     if (prevPart && prevPart.op == part.op && compareAttribs(prevPart.attribs, part.attribs)) {
-      switch (part.op) {
-        case '+':
-          pot += parsed.bank.substring(0, part.len);
-          parsed.bank = parsed.bank.substring(part.len);
-          break;
-      }
       prevPart.len += part.len;
       prevPart.newlines += part.newlines;
     } else {
       if (prevPart) {
-        append_part(prevPart);
+        collapsed = append_part(collapsed, prevPart);
+        prevPart = null;
+      }
+      prevPart = part;
+    }
+  }
+  if (prevPart)
+    collapsed = append_part(collapsed, prevPart);
+  collapsed += "$" + parsed.bank;
+
+  //optimize - and + operators
+  parsed = parseChangeset(collapsed);
+  optimized = parsed.prefix;
+  var pot = "";
+  var prevPart = null;
+  var text = oldText;
+  
+  for (var part in parsed.ops) {
+    if (prevPart && part.op == '+') {
+      //TODO: optimize from left to right also
+      textPart = text.substring(0, prevPart.len);
+      potPart = parsed.bank.substring(0, part.len);
+      var i = textPart.length-1;
+      var j = potPart.length-1;
+      var newlines = 0;
+      for (; textPart[i] == potPart[j] && (i > 0) && (j > 0); i--, j--)
+        if (textPart[i] == '\n')
+          newlines++;
+      len = textPart.length - 1 - i;
+      prevPart.len -= len;
+      prevPart.newlines -= newlines;
+      part.len -= len;
+      part.newlines -= newlines;
+      optimized = append_part(optimized, prevPart);
+      optimized = append_part(optimized, part);
+      newPart = {op: '=', len: len, newlines: newlines, attribs: []};
+      optimized = append_part(optimized, newPart);
+
+      pot += parsed.bank.substring(0, part.len);
+      parsed.bank = parsed.bank.substring(part.len + len);
+      prevPart = null;
+    } else {
+      if (prevPart) {
+        //unoptimized '-' op
+        text = text.substring(prevPart.len);
+        optimized = append_part(optimized, prevPart);
         prevPart = null;
       }
       switch (part.op) {
         case '=':
-          prevPart = part;
+          text = text.substring(part.len);
+          optimized = append_part(optimized, part);
           break;
         case '+':
           pot += parsed.bank.substring(0, part.len);
           parsed.bank = parsed.bank.substring(part.len);
-          prevPart = part;
+          optimized = append_part(optimized, part);
           break;
         case '-':
           prevPart = part;
@@ -212,13 +248,28 @@ function optimizeChangeset(oldText, changeset) {
       }
     }
   }
-
   if (prevPart)
-    append_part(prevPart);
-
+    optimized = append_part(optimized, prevPart);
   optimized += "$" + pot;
 
-  return optimized;
+  //collapse the changeset again removing useless equals operators
+  parsed = parseChangeset(optimized);
+  recollapsed = parsed.prefix;
+  var prevPart = null;
+  for (var part in parsed.ops) {
+    if (prevPart) {
+      recollapsed = append_part(recollapsed, prevPart);
+      prevPart = null;
+    }
+    if (part.op == '=') {
+      prevPart = part;
+    } else {
+      recollapsed = append_part(recollapsed, part);
+    }
+  }
+  recollapsed += "$" + parsed.bank;
+
+  return recollapsed;
 }
 
 /**

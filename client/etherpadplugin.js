@@ -30,6 +30,8 @@ WYMeditor.editor.prototype.etherpad = function(guioptions, options) {
   var etherpadGui = new WymEtherpadGUI(guioptions, options, this);
   this._etherpadGui = etherpadGui;
 
+  //var handler = this._etherpadGui._etherpad;
+  //jQuery(this._wym._doc).bind("keyup", function(evt) {handler.submitChanges();});
   return etherpadGui;
 };
 
