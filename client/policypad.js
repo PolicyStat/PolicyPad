@@ -227,7 +227,7 @@ function optimizeChangeset(oldText, changeset) {
  *
  * Based on John Resig's JavaScript diff algorithm
  */
-function generateChangeset(o,n){
+function generateChangeset(oldText, newText){
 
     function _newlines(t) {
         var newlines = t.match(/\n/g);
@@ -237,7 +237,7 @@ function generateChangeset(o,n){
         return '|' + newlines.length;
     }
 
-    function _diff(o,n){
+    function _diff(o, n){
         var ns = {}; 
         var os = {};
         var i;
@@ -278,21 +278,21 @@ function generateChangeset(o,n){
     }
 
     var packNum = function(num) { return num.toString(36).toLowerCase(); };
-    var str = 'Z:' + packNum(o.length);
-    str += n.length > o.length 
-        ? '>' + packNum(n.length - o.length) 
-        : '<' + packNum(o.length - n.length); 
-    var out = _diff(o == '' ? [] : o.split(/>/), n== '' ? [] : n.split(/>/));
+    var str = 'Z:' + packNum(oldText.length);
+    str += newText.length > oldText.length 
+        ? '>' + packNum(newText.length - oldText.length) 
+        : '<' + packNum(oldText.length - newText.length); 
+    var out = _diff(oldText == '' ? [] : oldText.split(/ /), newText == '' ? [] : newText.split(/ /));
     var pot = '';
     var i;
     var pre;
     var potentialStr = '';
     var currentText;
     //var oSpace = o.match(/\s+/g);
-    var oSpace = o.match(/>/g);
+    var oSpace = oldText.match(/ /g);
     //var nSpace = n.match(/\s+/g);
-    var nSpace = n.match(/>/g);
-    var start = true;
+    var nSpace = newText.match(/ /g);
+    var start = true
 
     if (oSpace == null) {
         oSpace=[];
@@ -360,7 +360,11 @@ function generateChangeset(o,n){
             }
         }
     }
-    return optimizeChangeset(o, str + '$' + pot);
+    result = optimizeChangeset(oldText, str + '$' + pot);
+    if (applyChangeset(oldText, result) != newText) {
+        alert("Changeset Generation Failed");
+    }
+    return optimizeChangeset(oldText, str + '$' + pot);
 }
 
 function mergeChangeset(cs1, cs2) {
