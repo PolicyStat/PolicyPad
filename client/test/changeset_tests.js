@@ -34,6 +34,9 @@ test('simple insertion', function() {
     changesetTest('foobaz', 'foobarbaz', 'Three letter insert to center');
     changesetTest('foo', 'foobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobarfoobar', 'Many letter append');
     changesetTest('', 'foobar', 'Empty string append');
+    changesetTest('foo bar baz', 'foo extra bar baz', 'Word append');
+    changesetTest('foo\nbar\nbaz\n', 'foo\nbar\nbing\nbaz\n', 'Word append on new line');
+    changesetTest('foo\n bar', 'foo\n baz\nbar', 'Multiple whitespace characters');
 });
 
 test('HTML-specific insertion', function() {
@@ -41,6 +44,9 @@ test('HTML-specific insertion', function() {
     changesetTest('<p>Hello world!</p><p>Goodbye world!</p>', '<p>Hello world!</p><p>This is a test.</p><p>Goodbye world!</p>', 'Paragraph insert mid-document');
     changesetTest('<br />', '<table summary="Just another table"><caption>A new table</caption><tbody><tr><td></td><td></td></tr><tr><td></td><td></td></tr><tr><td></td><td></td></tr></tbody></table>', 'Table insert from empty');
     changesetTest('<table summary="Just another table"><caption>A new table</caption><tbody><tr><td></td><td></td></tr><tr><td></td><td></td></tr><tr><td></td><td></td></tr></tbody></table>', '<table summary="Just another table"><caption>A new table</caption><tbody><tr><td>one</td><td>two</td></tr><tr><td>three</td><td>four</td></tr><tr><td>five</td><td>six</td></tr></tbody></table>', 'Populate table with values');
+    changesetTest('<p>a\nb\nc\nd</p>', '<p>a\nb\nc\nq\nd</p>', 'Insert new word on new line');
+    changesetTest('<p>a</p>\n<p>b</p\n<p>c</p>\n', '<p>a</p>\n<p>b</p\n<p>q</p>\n<p>c</p>\n', 'Insert paragraph on new line');
+    changesetTest('<p>a \n b</p>', '<p>a \nc\n b</p>', 'Insert word on new line with spaces');
 });
 
 
