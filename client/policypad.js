@@ -249,16 +249,16 @@ function generateChangeset(o,n){
     str += n.length > o.length 
         ? '>' + packNum(n.length - o.length) 
         : '<' + packNum(o.length - n.length); 
-    var out = _diff(o == '' ? [] : o.split(/</), n== '' ? [] : n.split(/</));
+    var out = _diff(o == '' ? [] : o.split(/>/), n== '' ? [] : n.split(/>/));
     var pot = '';
     var i;
     var pre;
     var potentialStr = '';
     var currentText;
     //var oSpace = o.match(/\s+/g);
-    var oSpace = o.match(/</g);
+    var oSpace = o.match(/>/g);
     //var nSpace = n.match(/\s+/g);
-    var nSpace = n.match(/</g);
+    var nSpace = n.match(/>/g);
     var start = true;
 
     if (oSpace == null) {
