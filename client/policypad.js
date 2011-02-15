@@ -56,19 +56,31 @@ function parseChangeset(changeset) {
     this._ops.pop();
   }
   OpIterator.prototype.next = function() {
+    var iterator = this;
+
     if (this._lens.length == 0)
       throw StopIteration;
-    var op = this._ops.shift();
-    var len = convBase36(this._lens.shift());
 
-    if (op == '|') {
-     return {
-       op: this._ops.shift(), 
-       len: convBase36(this._lens.shift()),
-       newlines: len
-       };
+    var nextPart = function() {
+      return {op: iterator._ops.shift(), len: convBase36(iterator._lens.shift())};
     }
-    return {op: op, len: len, newlines: 0};
+
+    var newlines = 0;
+    var attribs = [];
+    var part = nextPart();
+    while (part.op == '|' || part.op == '*') {
+      if (part.op == '|') {
+        newlines = part.len;
+      } else {
+        attribs.push(part.len);
+      }
+      part = nextPart();
+    }
+
+    part.newlines = newlines;
+    part.attribs = attribs;
+
+    return part;
   }
   OpIterator.prototype.__iterator__ = function() { return this; }
 
@@ -90,29 +102,30 @@ function parseChangeset(changeset) {
  * @return A new document, transformed by the changeset
  */
 function applyChangeset(oldText, changeset) {
-  var res = '';
-
-  parsed = parseChangeset(changeset);
-  if (!parsed)
-    return null;
-  if (oldText.length != parsed.oldlen) {
+  var res = ''; 
+  
+  var fail = function() {
     return null;
   }
 
+  parsed = parseChangeset(changeset);
+  if (!parsed)
+    return fail();
+  if (oldText.length != parsed.oldlen) {
+    return fail();
+  }
+
+  //TODO: update attribs
   var i = 0;
-  var attribs = [];
   for (var part in parsed.ops) {
     switch (part.op) {
       case '=':
         change = oldText.substring(i, i + part.len);
         if (change.split('\n').length-1 != part.newlines) {
-          return null;
+          return fail();
         }
         res += change;
         i += part.len;
-        break;
-      case '*':
-        //TODO: update attribs
         break;
       case '+':
         res += parsed.bank.substring(0, part.len);
@@ -120,7 +133,7 @@ function applyChangeset(oldText, changeset) {
         break;
       case '-':
         if (oldText.substring(i, i + part.len).split('\n').length-1 != part.newlines) {
-          return null;
+          return fail();
         }
         i += part.len;
         break;
@@ -131,7 +144,7 @@ function applyChangeset(oldText, changeset) {
   res += oldText.substring(i);
 
   if (res.length != newlen) {
-    return null;
+    return fail();
   }
 
   return res;
@@ -144,16 +157,39 @@ function optimizeChangeset(oldText, changeset) {
   optimized = parsed.prefix;
   var append_part = function(part) {
     var packNum = function(num) { return num.toString(36).toLowerCase(); };
+    for (var i = 0; i < part.attribs.length; i++) {
+      optimized += "*" + part.attribs[i];
+    }
     if (part.newlines > 0)
       optimized += "|" + packNum(part.newlines);
     optimized += part.op + packNum(part.len);
-  }
+  };
+
+  var compareAttribs = function(attribs1, attribs2) {
+    attribs1 = attribs1.slice(0);
+    attribs2 = attribs2.slice(0);
+
+    if (attribs1.length != attribs2.length)
+      return false;
+
+    for (var i = 0; i < attribs1.length; i++)
+      if (attribs1[i] != attribs2[i])
+        return false;
+
+    return true;
+  };
 
   pot = "";
 
   var prevPart = null;
   for (var part in parsed.ops) {
-    if (prevPart && prevPart.op == part.op) {
+    if (prevPart && prevPart.op == part.op && compareAttribs(prevPart.attribs, part.attribs)) {
+      switch (part.op) {
+        case '+':
+          pot += parsed.bank.substring(0, part.len);
+          parsed.bank = parsed.bank.substring(part.len);
+          break;
+      }
       prevPart.len += part.len;
       prevPart.newlines += part.newlines;
     } else {
@@ -163,9 +199,6 @@ function optimizeChangeset(oldText, changeset) {
       }
       switch (part.op) {
         case '=':
-          prevPart = part;
-          break;
-        case '*':
           prevPart = part;
           break;
         case '+':
