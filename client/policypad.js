@@ -199,47 +199,59 @@ function generateChangeset(o,n){
     function _newlines(t) {
         var newlines = t.match(/\n/g);
         if (newlines == null) {
-            return "";
+            return '';
         }
         return '|' + newlines.length;
     }
 
     function _diff(o,n){
-        var ns={},os={},i,x=null
-        for(i=0;i<n.length;i++){if(ns[n[i]]==x)ns[n[i]]={rows:[],o:x};ns[n[i]].rows.push(i)}
-        for(i=0;i<o.length;i++){if(os[o[i]]==x)os[o[i]]={rows:[],n:x};os[o[i]].rows.push(i)}
-        for(i in ns){
-            if(ns[i].rows.length==1 && typeof(os[i])!='undefined' && os[i].rows.length==1){
-                n[ns[i].rows[0]]={text:n[ns[i].rows[0]],row:os[i].rows[0]}
-                o[os[i].rows[0]]={text:o[os[i].rows[0]],row:ns[i].rows[0]}
+        var ns = {}; 
+        var os = {};
+        var i;
+        var x = null;
+        for (i=0; i<n.length; i++) {
+            if (ns[n[i]] == x) {
+                ns[n[i]] = {rows:[], o:x};
+            }
+            ns[n[i]].rows.push(i)
+        }
+        for (i=0; i<o.length; i++) {
+            if(os[o[i]] == x) {
+                os[o[i]] = {rows:[], n:x};
+            }
+            os[o[i]].rows.push(i);
+        }
+        for (i in ns){
+            if (ns[i].rows.length == 1 && typeof(os[i]) != 'undefined' && os[i].rows.length == 1){
+                n[ns[i].rows[0]] = {text:n[ns[i].rows[0]], row:os[i].rows[0]};
+                o[os[i].rows[0]] = {text:o[os[i].rows[0]], row:ns[i].rows[0]};
             }
         }
-        for(i=0;i<n.length-1;i++){
-            if(n[i].text!=x && n[i+1].text==x && n[i].row+1<o.length && o[n[i].row+1].text==x &&
-            n[i+1]==o[n[i].row+1]){
-                n[i+1]={text:n[i+1],row:n[i].row+1}
-                o[n[i].row+1]={text:o[n[i].row+1],row:i+1}
+        for (i=0; i<n.length-1; i++){
+            if (n[i].text != x && n[i+1].text == x && n[i].row + 1 < o.length 
+                && o[n[i].row+1].text == x && n[i+1]==o[n[i].row+1]) {
+                n[i+1] = {text:n[i+1], row:n[i].row+1};
+                o[n[i].row+1] = {text:o[n[i].row+1], row:i+1};
             }
         }
-        for(i=n.length-1;i>0;i--){
+        for(i=n.length-1; i>0; i--){
             if(n[i].text!=x && n[i-1].text==x && n[i].row>0 && o[n[i].row-1].text==x &&
-            n[i-1]==o[n[i].row-1]){
-                n[i-1]={text:n[i-1],row:n[i].row-1}
-                o[n[i].row-1]={text:o[n[i].row-1],row:i-1}
+            n[i-1] == o[n[i].row-1]) {
+                n[i-1] = {text:n[i-1], row:n[i].row - 1};
+                o[n[i].row-1] = {text:o[n[i].row-1], row:i - 1};
             }
         }
-        return {o:o,n:n}
+        return {o:o, n:n}
     }
 
     var packNum = function(num) { return num.toString(36).toLowerCase(); };
-    var out = _diff(o == '' ? [] : o.split(/\s+/), n== '' ? [] : n.split(/\s+/));
     var str = 'Z:' + packNum(o.length);
     str += n.length > o.length 
         ? '>' + packNum(n.length - o.length) 
         : '<' + packNum(o.length - n.length); 
+    var out = _diff(o == '' ? [] : o.split(/\s+/), n== '' ? [] : n.split(/\s+/));
     var pot = '';
     var i;
-    var x = null; 
     var pre;
     var potentialStr = '';
     var currentText;
@@ -247,15 +259,16 @@ function generateChangeset(o,n){
     var nSpace = n.match(/\s+/g);
     var start = true;
 
-    if (oSpace == x) {
+    if (oSpace == null) {
         oSpace=[];
     }
 
-    if (nSpace == x) {
+    if (nSpace == null) {
         nSpace=[];
     }
     
-    if (out.n.length==0) {
+    /* Handle the case were we delete everything */
+    if (out.n.length == 0) { 
         for(i=0; i<out.o.length; i++) {
             currentText = out.o[i] + (i >= oSpace.length ? '' : oSpace[i]);
             str += potentialStr;
@@ -265,8 +278,10 @@ function generateChangeset(o,n){
         }
     }
     else {
-        if (out.n[0].text==x) {
-            for(n=0; n<out.o.length && out.o[n].text==x; n++) {
+
+        /* Handle the case where we delete the first word */
+        if (out.n[0].text == null) {
+            for(n=0; n<out.o.length && out.o[n].text==null; n++) {
                 currentText = out.o[n] + (n >= oSpace.length ? '' : oSpace[n]);
                 str += potentialStr;
                 str += _newlines(currentText) + '-' + packNum(currentText.length);
@@ -274,8 +289,11 @@ function generateChangeset(o,n){
                 start = false;
             }
         }
+
         for (i=0; i<out.n.length; i++) {
-            if (out.n[i].text==x) {
+
+            /* Additions */
+            if (out.n[i].text == null) {
                 currentText = out.n[i] + (i >= nSpace.length ? '' : nSpace[i]);
                 str += potentialStr;
                 str += '*0' + _newlines(currentText) + '+' + packNum(currentText.length);
@@ -283,14 +301,19 @@ function generateChangeset(o,n){
                 pot += currentText;
                 start = false;
             }
+
             else {
                 pre='';
-                for (n=out.n[i].row+1; n<out.o.length && out.o[n].text==x; n++) {
+
+                /* Deletions */
+                for (n=out.n[i].row+1; n<out.o.length && out.o[n].text == null; n++) {
                     currentText = out.o[n] + (n >= oSpace.length ? '' : oSpace[n]);
-                    pre += '-' + packNum(currentText.length);
+                    pre += _newlines(currentText) + '-' + packNum(currentText.length);
                 }
-                currentText = /*(start ? '' : " ") +*/ out.n[i].text + (i >= nSpace.length ? '' : nSpace[i]);
+                currentText = out.n[i].text + (i >= nSpace.length ? '' : nSpace[i]);
                 start = false;
+
+                /* Skips */
                 if (pre == '') {
                     potentialStr += _newlines(currentText) + '=' + packNum(currentText.length);
                 } else {
