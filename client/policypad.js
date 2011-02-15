@@ -222,7 +222,7 @@ function generateChangeset(o,n){
                     currentText = out.o[n] + (n >= oSpace.length ? '' : oSpace[n]);
                     pre += '-' + packNum(currentText.length);
                 }
-                currentText = (start ? '' : " ") + out.n[i].text + (i >= nSpace.length ? '' : nSpace[i]);
+                currentText = /*(start ? '' : " ") +*/ out.n[i].text + (i >= nSpace.length ? '' : nSpace[i]);
                 start = false;
                 if (pre == '') {
                     potentialStr += _newlines(currentText) + '=' + packNum(currentText.length);
