@@ -128,7 +128,7 @@ WymEtherpadGUI.prototype.refreshUsers = function() {
     var i;
     var users = this._etherpad.getUserList();
     for (i=0; i<users.length; i++) {
-    	msg = msg + users[i].name + '\n';
+    	msg = msg + users[i].name + '\r\n';
     }
     $('#userlist').text(msg);
 }

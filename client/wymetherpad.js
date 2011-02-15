@@ -43,7 +43,7 @@ WymEtherpad.prototype.init = function() {
     etherpad._clientVars = clientVars;
     userInfo = {
       userId:    clientVars.userId,
-      name:      this._options.username,
+      name:      etherpad._options.username,
       ip:        clientVars.clientIp,
       colorId:   clientVars.userColor,
       userAgent: padutils.uaDisplay(clientVars.userAgent)

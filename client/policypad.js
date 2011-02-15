@@ -14,16 +14,7 @@
 * limitations under the License.
 */
 
-
-/**
- * Takes oldText and applies the given changeset to it.
- * @param {String} oldText The original text to modify.
- * @param {String} changeset The changeset to apply the document
- * @return A new document, transformed by the changeset
- */
-function applyChangeset(oldText, changeset) {
-  var trueChangeset = changeset;
-  var res = '';
+function parseChangeset(changeset) {
   var parts = changeset.split('$');
   
   if (changeset.substring(0,2) != "Z:")  {
@@ -32,7 +23,6 @@ function applyChangeset(oldText, changeset) {
   if (parts.length != 2) {
       return null;
   }
-
   
   var bank = parts[1];
   changeset = parts[0].substring(2);
@@ -57,10 +47,6 @@ function applyChangeset(oldText, changeset) {
       return null;
   }
 
-  if (oldText.length != oldlen) {
-    return null;
-  }
-
   changeset = changeset.substring(parts[0].length);
 
   function OpIterator(changeset) {
@@ -77,10 +63,35 @@ function applyChangeset(oldText, changeset) {
   OpIterator.prototype.__iterator__ = function() { return this; }
 
   var ops = new OpIterator(changeset);
+
+  return {
+    ops: ops,
+    oldlen: oldlen,
+    newlen: newlen,
+    bank: bank
+  };
+}
+
+/**
+ * Takes oldText and applies the given changeset to it.
+ * @param {String} oldText The original text to modify.
+ * @param {String} changeset The changeset to apply the document
+ * @return A new document, transformed by the changeset
+ */
+function applyChangeset(oldText, changeset) {
+  var res = '';
+
+  parsed = parseChangeset(changeset);
+  if (!parsed)
+    return null;
+  if (oldText.length != parsed.oldlen) {
+    return null;
+  }
+
   var i = 0;
   var attribs = [];
   var newlines = 0;
-  for (var part in ops) {
+  for (var part in parsed.ops) {
     switch (part.op) {
       case '=':
         change = oldText.substring(i, i + part.len);
@@ -98,8 +109,8 @@ function applyChangeset(oldText, changeset) {
         newlines = part.len;
         break;
       case '+':
-        res += bank.substring(0, part.len);
-        bank = bank.substring(part.len);
+        res += parsed.bank.substring(0, part.len);
+        parsed.bank = parsed.bank.substring(part.len);
         break;
       case '-':
         if (oldText.substring(i, i + part.len).split('\n').length-1 != newlines) {
@@ -119,6 +130,14 @@ function applyChangeset(oldText, changeset) {
   }
 
   return res;
+}
+
+function optimizeChangeset(oldText, changeset) {
+
+  parsed = parseChangeset(changeset);
+
+
+  return changeset;
 }
 
 /**
@@ -235,7 +254,7 @@ function generateChangeset(o,n){
             }
         }
     }
-    return str + '$' + pot;
+    return optimizeChangeset(str + '$' + pot);
 }
 
 function mergeChangeset(cs1, cs2) {
