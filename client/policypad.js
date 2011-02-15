@@ -249,14 +249,16 @@ function generateChangeset(o,n){
     str += n.length > o.length 
         ? '>' + packNum(n.length - o.length) 
         : '<' + packNum(o.length - n.length); 
-    var out = _diff(o == '' ? [] : o.split(/\s+/), n== '' ? [] : n.split(/\s+/));
+    var out = _diff(o == '' ? [] : o.split(/</), n== '' ? [] : n.split(/</));
     var pot = '';
     var i;
     var pre;
     var potentialStr = '';
     var currentText;
-    var oSpace = o.match(/\s+/g);
-    var nSpace = n.match(/\s+/g);
+    //var oSpace = o.match(/\s+/g);
+    var oSpace = o.match(/</g);
+    //var nSpace = n.match(/\s+/g);
+    var nSpace = n.match(/</g);
     var start = true;
 
     if (oSpace == null) {
@@ -267,7 +269,7 @@ function generateChangeset(o,n){
         nSpace=[];
     }
     
-    /* Handle the case were we delete everything */
+    /* Handle the case where we delete everything */
     if (out.n.length == 0) { 
         for(i=0; i<out.o.length; i++) {
             currentText = out.o[i] + (i >= oSpace.length ? '' : oSpace[i]);
@@ -306,14 +308,14 @@ function generateChangeset(o,n){
                 pre='';
 
                 /* Deletions */
-                for (n=out.n[i].row+1; n<out.o.length && out.o[n].text == null; n++) {
+                for (n = out.n[i].row+1; n < out.o.length && out.o[n].text == null; n++) {
                     currentText = out.o[n] + (n >= oSpace.length ? '' : oSpace[n]);
                     pre += _newlines(currentText) + '-' + packNum(currentText.length);
                 }
-                currentText = out.n[i].text + (i >= nSpace.length ? '' : nSpace[i]);
-                start = false;
 
                 /* Skips */
+                currentText = out.n[i].text + (i >= oSpace.length ? '' : oSpace[i]);
+                start = false;
                 if (pre == '') {
                     potentialStr += _newlines(currentText) + '=' + packNum(currentText.length);
                 } else {
