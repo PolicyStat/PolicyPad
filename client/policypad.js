@@ -58,7 +58,7 @@ function parseChangeset(changeset) {
   OpIterator.prototype.next = function() {
     var iterator = this;
 
-    if (this._lens.length == 0)
+    if (!this.hasNext())
       throw StopIteration;
 
     var nextPart = function() {
@@ -81,6 +81,9 @@ function parseChangeset(changeset) {
     part.attribs = attribs;
 
     return part;
+  }
+  OpIterator.prototype.hasNext = function() {
+    return this._lens.length > 0;
   }
   OpIterator.prototype.__iterator__ = function() { return this; }
 
@@ -418,8 +421,205 @@ function generateChangeset(oldText, newText){
     return optimizeChangeset(oldText, str + '$' + pot);
 }
 
-function mergeChangeset(cs1, cs2) {
-    // TODO: Check if code like this already exists
-    // Particularly check changeset.js in same directory - written by our team???
-    return '';
+function mergeChangeset(base, cs1, cs2) {
+  var merged = '';
+  var mergedBank = '';
+  var pos = 0;
+
+  var packNum = function(num) { return num.toString(36).toLowerCase(); };
+  var append_part = function(part) {
+    for (var i = 0; i < part.attribs.length; i++) {
+      merged += "*" + part.attribs[i];
+    }
+    if (part.newlines > 0)
+      merged += "|" + packNum(part.newlines);
+    merged += part.op + packNum(part.len);
+  };
+  var rem_len = function(part, bank, len) {
+    //count the newlines
+    if (part.op == '+') {
+        part.newlines -= bank.substring(0, len).split('\n').length-1;
+    } else {
+        part.newlines -= base.substring(pos, len).split('\n').length-1;
+    }
+    part.len -= len;
+  }
+
+  var parsed1 = parseChangeset(cs1);
+  var parsed2 = parseChangeset(cs2);
+
+  var part1 = parsed1.ops.next();
+  var part2 = parsed2.ops.next();
+
+  var iterate1 = function() {
+    try {
+      part1 = parsed1.ops.next();
+    } catch (err if err instanceof StopIteration) {
+      part1 = null;
+    }
+  };
+  var iterate2 = function() {
+    try {
+      part2 = parsed2.ops.next();
+    } catch (err if err instanceof StopIteration) {
+      part2 = null;
+    }
+  };
+  
+  var oldlen = parsed1.oldlen;
+  var newlen = 0;
+
+  while (part1 && part2) {
+    //When an operation occurs at the same position...
+    // = = | skip
+    // = + | insert the text
+    // = - | remove the text
+    // + + | insert cs2 changes before cs1 (this will increase the length of the document
+    // - - | combine events into single deletion (max of two lengths)
+    // + - | replace deleted text with addition
+
+    if (part1.op == '=' || part2.op == '=') {
+      if (part1.op == '=' && part2.op == '=') {
+        //= =
+        var dPos;
+        if (part1.len == part2.len) {
+          dPos = part1.len;
+          append_part(part1);
+          iterate1();
+          iterate2();
+        } else if (part1.len < part2.len) {
+          append_part(part1);
+          dPos = part1.len;
+          rem_len(part2, parsed2.bank, dPos);
+          iterate1();
+        } else {
+          append_part(part2);
+          dPos = part2.len;
+          rem_len(part1, parsed1.bank, dPos);
+          iterate2();
+        }
+        base = base.substring(dPos);
+        pos += dPos;
+        newlen += dPos;
+        continue;
+      }
+
+      //reorder changesets so equals op always comes first
+      var swapped = false;
+      if (part1.op != '=') {
+        var tmp = part1;
+        part1 = part2;
+        part2 = tmp;
+
+        tmp = parsed1;
+        parsed1 = parsed2;
+        parsed2 = tmp;
+
+        swapped = true;
+      }
+
+      if (part2.op == '+') {
+        // = +
+          append_part(part2);
+          mergedBank += parsed2.bank.substring(0, part2.len);
+          parsed2.bank = parsed2.bank.substring(part2.len);
+          newlen += part2.len;
+          iterate2();
+      } else if (part2.op == '-') {
+        // = -
+        if (part2.len <= part1.len) {
+          append_part(part2);
+          //newlen -= part2.len;
+          base = base.substring(part2.len);
+          rem_len(part1, parsed1.bank, part2.len);
+          if (!part1.len)
+            iterate1();
+          iterate2();
+        } else {
+          //no conflictions yet, but this will push us into that state
+          //TODO: implement
+          return null;
+        }
+      } else {
+        // = ?
+        return null;
+      }
+
+      //undo swap
+      if (swapped) {
+        var tmp = part1;
+        part1 = part2;
+        part2 = tmp;
+
+        tmp = parsed1;
+        parsed1 = parsed2;
+        parsed2 = tmp;
+      }
+    } else if (part1.op == '+' && part2.op == '+') {
+      // + +
+      //TODO: implement
+      iterate1();
+      iterate2();
+    } else if (part1.op == '-' && part2.op == '-') {
+      // - -
+      //TODO: implement
+      iterate1();
+      iterate2();
+    } else {
+      // + - Swap may be needed
+      //TODO: implement
+      iterate1();
+      iterate2();
+    }
+    
+
+  }
+
+  //apply the remainder of the other changeset (if it exists)
+  if (part2) {
+    var tmp = part1;
+    part1 = part2;
+    part2 = tmp;
+
+    tmp = parsed1;
+    parsed1 = parsed2;
+    parsed2 = tmp;
+  }
+  while (part1) {
+    switch (part1.op) {
+      case '=':
+        append_part(part1);
+        newlen += part1.len;
+        base = base.substring(part1.len);
+        break;
+      case '+':
+        append_part(part1);
+        mergedBank += parsed1.bank.substring(0, part1.len);
+        parsed1.bank = parsed1.bank.substring(part1.len);
+        newlen += part1.len;
+        break;
+      case '-':
+        append_part(part1);
+        base = base.substring(part1.len);
+        break;
+      default:
+        return null;
+    }
+    iterate1();
+  }
+  //addon remaining characters in the base document
+  newlen += base.length;
+
+  //assemble the changeset
+  var prefix = "Z:" + packNum(oldlen);
+
+  if (newlen <= oldlen) {
+    prefix += "<" + packNum(oldlen-newlen);
+  } else {
+    prefix += ">" + packNum(newlen-oldlen);
+  }
+
+  merged = prefix + merged + "$" + mergedBank;
+
+  return merged;
 }

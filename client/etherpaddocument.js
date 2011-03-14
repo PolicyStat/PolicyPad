@@ -43,18 +43,29 @@ EtherpadDocument.prototype.generateChangeset = function() {
 }
 
 EtherpadDocument.prototype.applyChangeset = function(changeset, apool) {
-  //1. Generate changeset between html and prevHtml
-  //var diff = generateChangeset(this._prevHtml, this._func());
+  if (this._prevHtml == this._func()) {
+    //no need to merge changes, just apply the changeset to our base
+    var newhtml = applyChangeset(this._prevHtml, changeset);
+    this._func(newhtml);
+    this._prevHtml = newhtml;
+  }
+  else {
+    //We have local uncommitted changes, this merge is a bit more complicated
 
-  //2. Merge the two changesets
-  //3. Apply the changeset to html
-  //4. Apply changeset to prevHtml
+    //1. Generate changeset between html and prevHtml
+    var baseDiff = generateChangeset(this._prevHtml, this._func());
 
+    //2. Merge the two changesets
+    var merged = mergeChangeset(this._prevHtml, baseDiff, changeset);
 
-  //FIXME: remove temp code
-  newhtml = applyChangeset(this._prevHtml, changeset);
-  this._func(newhtml);
-  this._prevHtml = newhtml;
+    //3. Apply merged to func()
+    var newHtml = applyChangeset(this._func(), merged);
+    this._func(newHtml);
+    
+    //4. Apply changeset to prevHtml
+    this._prevHtml = applyChangeset(this._prevHtml, changeset);
+  }
+
   return;
 }
 
