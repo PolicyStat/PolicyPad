@@ -28,6 +28,7 @@ module('Insertion');
 
 test('non-overlapping merge',
      function() {
+   equals(applyChangeset('hello world', mergeChangeset('hello world', 'Z:b<0-1*0+1$H', 'Z:b<0=6-1*0+1$W')), 'Hello World', 'hello world/Hello World');
 	 equals(mergeChangeset('jacob', 'Z:5<1=1-1$', 'Z:5<1=3-1$'), 'Z:5<2=1-1=1-1$', 'jacob/jcb');
 	 equals(mergeChangeset('eeasstterr eeeeggg', 'Z:i<2=6-1=2-1$', 'Z:i<6=1-1=2-1=7-3=2-1$'), 'Z:i<8=1-1=2-1=1-1=2-1=2-3=2-1$', 'eeasstterr eeeeggg/easter egg');
 	 equals(mergeChangeset('new york', 'Z:8<0-1*0+1$N', 'Z:8<0=4-1*0+1$Y'), 'Z:8<0-1*0+1=3-1*0+1$NY', 'new york/New York');

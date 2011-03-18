@@ -333,7 +333,7 @@ function generateChangeset(oldText, newText){
 
     var packNum = function(num) { return num.toString(36).toLowerCase(); };
     var str = 'Z:' + packNum(oldText.length);
-    str += newText.length > oldText.length 
+    str += newText.length >= oldText.length 
         ? '>' + packNum(newText.length - oldText.length) 
         : '<' + packNum(oldText.length - newText.length); 
     var out = _diff(oldText == '' ? [] : oldText.split(/ /), newText == '' ? [] : newText.split(/ /));
@@ -448,22 +448,24 @@ function mergeChangeset(base, cs1, cs2) {
   var parsed1 = parseChangeset(cs1);
   var parsed2 = parseChangeset(cs2);
 
+  //the current operations that we are working with
   var part1 = parsed1.ops.next();
   var part2 = parsed2.ops.next();
 
+  //set part1 to the next operation in ther parsed1 iterator
   var iterate1 = function() {
-    try {
+    if (parsed1.ops.hasNext())
       part1 = parsed1.ops.next();
-    } catch (err if err instanceof StopIteration) {
+    else
       part1 = null;
-    }
   };
+
+  //set part2 to the next operation in ther parsed2 iterator
   var iterate2 = function() {
-    try {
+    if (parsed2.ops.hasNext())
       part2 = parsed2.ops.next();
-    } catch (err if err instanceof StopIteration) {
+    else
       part2 = null;
-    }
   };
   
   var oldlen = parsed1.oldlen;
@@ -474,7 +476,7 @@ function mergeChangeset(base, cs1, cs2) {
     // = = | skip
     // = + | insert the text
     // = - | remove the text
-    // + + | insert cs2 changes before cs1 (this will increase the length of the document
+    // + + | insert cs2 changes before cs1 (this will increase the length of the document)
     // - - | combine events into single deletion (max of two lengths)
     // + - | replace deleted text with addition
 
@@ -613,7 +615,7 @@ function mergeChangeset(base, cs1, cs2) {
   //assemble the changeset
   var prefix = "Z:" + packNum(oldlen);
 
-  if (newlen <= oldlen) {
+  if (newlen < oldlen) {
     prefix += "<" + packNum(oldlen-newlen);
   } else {
     prefix += ">" + packNum(newlen-oldlen);
