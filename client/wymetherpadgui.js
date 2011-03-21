@@ -44,12 +44,19 @@ function WymEtherpadGUI(guioptions, options, wym) {
   //     return res;
   //   };
   // };
+
   var handleUIEvent = function(msg) {
     return function() {
       options.funcLog(msg);
       etherpad.submitChanges();
     };
   }
+
+  // Automatically send changes
+  // WymEtherpad should check to see if there are actually changes
+  setTimeout(function() {
+     handleUIEvent("timer tick");
+  }, 250);
 
   // wym.html = wrapSubmitOnNoReturn("html edit", wym.html);
   // wym.exec = wrapSubmit("exec", wym.exec);
@@ -63,7 +70,7 @@ function WymEtherpadGUI(guioptions, options, wym) {
   // wym.encloseStrings = wrapSubmit("encloseStrings", wym.encloseStrings);
   
   //register keyup handler
-  jQuery(this._doc).bind("keyup", handleUIEvent("keyup"));
+  //jQuery(this._doc).bind("keyup", handleUIEvent("keyup"));
   //TODO: finish implementing these
   //jQuery(this._wym.box).find(this._wym._options.iframeSelector).bind("mouseup", handleUIEvent("mouseup"));
   //jQuery(this._doc).bind("focus", handleUIEvent("focus"));
