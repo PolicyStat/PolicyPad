@@ -70,7 +70,7 @@ function genUTFromGenerate(old, new1, new2, newcombined) {
     var cs2 = generateChangeset(old, new2);
     var cs3 = generateChangeset(old, newcombined);
 
-    return "equals(mergeChangeset('" + cs1 + "', '"+ cs2+"'), '"+ cs3 +"', '"+old+"/"+newcombined+"');";
+    return "equals(mergeChangeset('"+old+"', '" + cs1 + "', '"+ cs2+"'), '"+ cs3 +"', '"+old+"/"+newcombined+"');";
 }
 
 function genUTFromApply(old, new1, new2, newcombined) {
@@ -79,7 +79,7 @@ function genUTFromApply(old, new1, new2, newcombined) {
     var cs1 = generateChangeset(old, new1);
     var cs2 = generateChangeset(old, new2);
 
-    return "equals(applyChangeset('"+old+"', mergeChangeset('"+cs1+"', '"+cs2+"')), '"+newcombined+"', '"+old+"/"+newcombined+"');";
+    return "equals(applyChangeset('"+old+"', mergeChangeset('"+old+"', '"+cs1+"', '"+cs2+"')), '"+newcombined+"', '"+old+"/"+newcombined+"');";
 }
 
 

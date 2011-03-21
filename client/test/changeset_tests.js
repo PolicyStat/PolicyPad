@@ -37,6 +37,7 @@ test('simple insertion', function() {
     changesetTest('foo bar baz', 'foo extra bar baz', 'Word append');
     changesetTest('foo\nbar\nbaz\n', 'foo\nbar\nbing\nbaz\n', 'Word append on new line');
     changesetTest('foo\n bar', 'foo\n baz\nbar', 'Multiple whitespace characters');
+    changesetTest('this is sentence', 'This is sentence of mine', 'change and append');
 });
 
 test('HTML-specific insertion', function() {
