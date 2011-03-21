@@ -54,7 +54,8 @@ function WymEtherpadGUI(guioptions, options, wym) {
 
   // Automatically send changes
   // WymEtherpad should check to see if there are actually changes
-  setTimeout(function() {
+  var 
+  setInterval(function() {
      handleUIEvent("timer tick");
   }, 250);
 
