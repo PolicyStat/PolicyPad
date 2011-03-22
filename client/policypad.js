@@ -571,9 +571,37 @@ function mergeChangeset(base, cs1, cs2) {
       iterate2();
     } else if (part1.op == '-' && part2.op == '-') {
       // - -
-      //TODO: implement
+      
+      var swapped = false;
+      if (part2.len > part1.len) {
+        var tmp = part1;
+        part1 = part2;
+        part2 = tmp;
+
+        tmp = parsed1;
+        parsed1 = parsed2;
+        parsed2 = tmp;
+
+        swapped = true;
+      }
+
+      //remove the first part, which is defined to be greater than or equal to
+      //the length of the second, so we can just throw away part2.
+      append_part(part1);
+      base = base.substring(part1.len);
       iterate1();
       iterate2();
+
+      //undo swap
+      if (swapped) {
+        var tmp = part1;
+        part1 = part2;
+        part2 = tmp;
+
+        tmp = parsed1;
+        parsed1 = parsed2;
+        parsed2 = tmp;
+      }
     } else {
       // + - Swap may be needed
       //TODO: implement

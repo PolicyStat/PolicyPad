@@ -46,8 +46,8 @@ test('mutual additions', function() {
 
 test('mutual removals', function() {
   equals(applyChangeset('This is a simple sentence.', mergeChangeset('This is a simple sentence.', 'Z:q<7=a-7$', 'Z:q<7=a-7$')), 'This is a sentence.', 'This is a simple sentence./This is a sentence.');
-  equals(applyChangeset('This is a simple sentence.', mergeChangeset('This is a simple sentence.', 'Z:q<3=a-6*0+3$sim', 'Z:q<7=a-7$')), 'This is a sentence.', 'This is a simple sentence./This is a sentence.');
-  equals(applyChangeset('This is a simple sentence.', mergeChangeset('This is a simple sentence.', 'Z:q<7=a-7$', 'Z:q<3=a-6*0+3$sim')), 'This is a sentence.', 'This is a simple sentence./This is a sentence.');
+  equals(applyChangeset('This is a simple sentence.', mergeChangeset('This is a simple sentence.', 'Z:q<3=a-3$', 'Z:q<7=a-7$')), 'This is a sentence.', 'This is a simple sentence./This is a sentence.');
+  equals(applyChangeset('This is a simple sentence.', mergeChangeset('This is a simple sentence.', 'Z:q<7=a-7$', 'Z:q<3=a-3$')), 'This is a sentence.', 'This is a simple sentence./This is a sentence.');
 });
 
 test('addition and removal', function() {
