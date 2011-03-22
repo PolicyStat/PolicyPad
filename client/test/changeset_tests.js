@@ -62,6 +62,8 @@ test('simple deletion', function() {
     changesetTest('foobar', 'foo', 'Deletion from end');
     changesetTest('foobarbaz', 'fooz', 'Deletion from center');
     changesetTest('foobarbaz', 'barbaz', 'Deletion from beginning');
+    changesetTest('Hello World', 'World', 'Delete first word');
+    changesetTest('Hello World', 'Hello', 'Delete last word');
 });
 
 test('HTML-specific deletion', function() {

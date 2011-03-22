@@ -476,9 +476,9 @@ function mergeChangeset(base, cs1, cs2) {
     // = = | skip
     // = + | insert the text
     // = - | remove the text
-    // + + | insert cs2 changes before cs1 (this will increase the length of the document)
+    // + + | insert cs2 changes after cs1 (this will increase the length of the document)
     // - - | combine events into single deletion (max of two lengths)
-    // + - | replace deleted text with addition
+    // + - | replace deleted text with addition (Perform deletion and then addition)
 
     if (part1.op == '=' || part2.op == '=') {
       if (part1.op == '=' && part2.op == '=') {
@@ -559,8 +559,15 @@ function mergeChangeset(base, cs1, cs2) {
       }
     } else if (part1.op == '+' && part2.op == '+') {
       // + +
-      //TODO: implement
+      //append first addition
+      append_part(part1);
+      mergedBank += parsed1.bank.substring(0, part1.len);
+      newlen += part1.len;
       iterate1();
+      //append second addition
+      append_part(part2);
+      mergedBank += parsed2.bank.substring(0, part2.len);
+      newlen += part2.len;
       iterate2();
     } else if (part1.op == '-' && part2.op == '-') {
       // - -

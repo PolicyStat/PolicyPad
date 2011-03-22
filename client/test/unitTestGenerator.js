@@ -29,7 +29,7 @@ function genCustom(form) {
     var mod2 = form.txt2_2.value;
     var mod = form.txt3_2.value;
 
-    form.txt_out.value = form.genUnitTest(original, mod1, mod2, mod);
+    form.txt_out.value += form.genUnitTest(original, mod1, mod2, mod) + "\n";
 }
 
 

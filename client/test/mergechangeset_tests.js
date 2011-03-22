@@ -38,12 +38,21 @@ test('independent changes', function() {
 });
 
 test('mutual additions', function() {
+  equals(applyChangeset('This is sentence', mergeChangeset('This is sentence', 'Z:g>2=8*0+2$a ', 'Z:g>2=8*0+2$a ')), 'This is a a sentence', 'This is sentence/This is a a sentence');
+  equals(applyChangeset('Append to first', mergeChangeset('Append to first', 'Z:f>3=6*0+3$ing', 'Z:f>2=6*0+2$ed')), 'Appendinged to first', 'Append to first/Appendinged to first');
+  equals(applyChangeset('word', mergeChangeset('word', 'Z:4>3=4*0+3$add', 'Z:4>4=4*0+4$more')), 'wordaddmore', 'word/wordaddmore');
+  equals(applyChangeset('word', mergeChangeset('word', 'Z:4>4=4*0+4$more', 'Z:4>3=4*0+3$add')), 'wordmoreadd', 'word/wordmoreadd');
 });
 
 test('mutual removals', function() {
+  equals(applyChangeset('This is a simple sentence.', mergeChangeset('This is a simple sentence.', 'Z:q<7=a-7$', 'Z:q<7=a-7$')), 'This is a sentence.', 'This is a simple sentence./This is a sentence.');
+  equals(applyChangeset('This is a simple sentence.', mergeChangeset('This is a simple sentence.', 'Z:q<3=a-6*0+3$sim', 'Z:q<7=a-7$')), 'This is a sentence.', 'This is a simple sentence./This is a sentence.');
+  equals(applyChangeset('This is a simple sentence.', mergeChangeset('This is a simple sentence.', 'Z:q<7=a-7$', 'Z:q<3=a-6*0+3$sim')), 'This is a sentence.', 'This is a simple sentence./This is a sentence.');
 });
 
 test('addition and removal', function() {
+  equals(applyChangeset('This s a sentence.', mergeChangeset('This s a sentence.', 'Z:i>7=9*0+7$simple ', 'Z:i>2=5-1*0+3$was')), 'This was a simple sentence.', 'This s a sentence./This was a simple sentence.');
+  equals(applyChangeset('b hello world b', mergeChangeset('b hello world b', 'Z:f>7-1*0+8$b prefix', 'Z:f<6=8-7*0+1$b')), 'b prefix hello b', 'b hello world b/b prefix hello b');
 });
 
 test('non-overlapping merge', function() {
