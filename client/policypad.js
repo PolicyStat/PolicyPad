@@ -604,9 +604,41 @@ function mergeChangeset(base, cs1, cs2) {
       }
     } else {
       // + - Swap may be needed
-      //TODO: implement
+
+      var swapped = false;
+      if (part2.op == '-') {
+        var tmp = part1;
+        part1 = part2;
+        part2 = tmp;
+
+        tmp = parsed1;
+        parsed1 = parsed2;
+        parsed2 = tmp;
+
+        swapped = true;
+      }
+
+      //part1 - removal
+      append_part(part1);
+      base = base.substring(part1.len);
       iterate1();
+
+      //part2 - addition
+      append_part(part2);
+      mergedBank += parsed2.bank.substring(0, part2.len);
+      newlen += part2.len;
       iterate2();
+
+      //undo swap
+      if (swapped) {
+        var tmp = part1;
+        part1 = part2;
+        part2 = tmp;
+
+        tmp = parsed1;
+        parsed1 = parsed2;
+        parsed2 = tmp;
+      }
     }
     
 
