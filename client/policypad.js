@@ -353,17 +353,14 @@ function generateChangeset(oldText, newText){
     str += newText.length >= oldText.length 
         ? '>' + packNum(newText.length - oldText.length) 
         : '<' + packNum(oldText.length - newText.length); 
+    
+    // Contains two sequences of tokens representing the substrings with relations to each other
     var out = _diff(oldText == '' ? [] : oldText.split(/ /), newText == '' ? [] : newText.split(/ /));
     var pot = '';
-    var i;
-    var pre;
     var potentialStr = '';
     var currentText;
-    //var oSpace = o.match(/\s+/g);
     var oSpace = oldText.match(/ /g);
-    //var nSpace = n.match(/\s+/g);
     var nSpace = newText.match(/ /g);
-    var start = true
 
     if (oSpace == null) {
         oSpace=[];
@@ -373,70 +370,80 @@ function generateChangeset(oldText, newText){
         nSpace=[];
     }
     
-    /* Handle the case where we delete everything */
-    if (out.n.length == 0) { 
-        for(i=0; i<out.o.length; i++) {
-            currentText = out.o[i] + (i >= oSpace.length ? '' : oSpace[i]);
-            str += potentialStr;
+    /* Deletion from the beginning of the string */
+    if (out.n[0].row != 0) {
+        for(n=0; n<out.o.length && out.o[n].text==null; n++) {
+            currentText = out.o[n] + (n >= oSpace.length ? '' : oSpace[n]);
             str += _newlines(currentText) + '-' + packNum(currentText.length);
+        }
+    }
+
+    /* Iterate over tokens in new text */
+    for (var i=0; i<out.n.length; i++) {
+
+        /* Addition (token in new text does not exist in old) */
+        if (out.n[i].text == null) {
+            currentText = out.n[i] + (i >= nSpace.length ? '' : nSpace[i]);
+            str += potentialStr;
+            str += '*0' + _newlines(currentText) + '+' + packNum(currentText.length);
             potentialStr = '';
-            start = false;
-        }
-    }
-    else {
+            pot += currentText;
+        
+        /* Skip, but may also be followed by deletions */
+        } else {
+            var dels = '';
+            var nextWordInOldPos = out.n[i].row + 1;
 
-        /* Handle the case where we delete the first word */
-        if (out.n[0].text == null) {
-            for(n=0; n<out.o.length && out.o[n].text==null; n++) {
+            /* Deletion Check */
+
+            /* 
+             * If the next word has been deleted from the old text, check to see
+             * if we're also missing the space following this word
+             */
+            if (nextWordInOldPos < out.o.length && 
+                    out.o[nextWordInOldPos].text == null && i 
+                    >= nSpace.length) {
+                dels += '-1';
+            }
+
+            /*
+             * Check old text tokens starting with the one corresponding to the position
+             * after our current word, and for each of them that's deleted, append
+             * the deletion operator to a temporary variable that we'll dump in a moment
+             */
+            for (n = nextWordInOldPos; n < out.o.length && out.o[n].text == null; n++) {
                 currentText = out.o[n] + (n >= oSpace.length ? '' : oSpace[n]);
-                str += potentialStr;
-                str += _newlines(currentText) + '-' + packNum(currentText.length);
-                potentialStr = '';
-                start = false;
-            }
-        }
-
-        for (i=0; i<out.n.length; i++) {
-
-            /* Additions */
-            if (out.n[i].text == null) {
-                currentText = out.n[i] + (i >= nSpace.length ? '' : nSpace[i]);
-                str += potentialStr;
-                str += '*0' + _newlines(currentText) + '+' + packNum(currentText.length);
-                potentialStr = '';
-                pot += currentText;
-                start = false;
+                dels += _newlines(currentText) + '-' + packNum(currentText.length);
             }
 
-            else {
-                pre='';
+            /* Writing Operators */
 
-                /* Deletions */
-                for (n = out.n[i].row+1; n < out.o.length && out.o[n].text == null; n++) {
-                    currentText = out.o[n] + (n >= oSpace.length ? '' : oSpace[n]);
-                    pre += _newlines(currentText) + '-' + packNum(currentText.length);
-                }
-
-                /* Skips */
-                currentText = out.n[i].text + (i >= oSpace.length ? '' : oSpace[i]);
-                start = false;
-                if (pre == '') {
-                    potentialStr += _newlines(currentText) + '=' + packNum(currentText.length);
-                } else {
-                    str += potentialStr;
-                    str += _newlines(currentText) + '=' + packNum(currentText.length) + pre;
-                    potentialStr = '';
-                }
-
+            /*
+             * Add the skip operator to our holding variable for skips, unless we've
+             * got deletions from the previous step, in which case dump all the skip
+             * operators into the changeset, followed by the deletion operators
+             */
+            currentText = out.n[i].text + (i >= nSpace.length ? '' : nSpace[i]);
+            if (dels == '') {
+                potentialStr += _newlines(currentText) + '=' + packNum(currentText.length);
+            } else {
+                str += potentialStr;
+                str += _newlines(currentText) + '=' + packNum(currentText.length) + dels;
+                potentialStr = '';
             }
         }
     }
+
     result = optimizeChangeset(oldText, str + '$' + pot);
+
     if (applyChangeset(oldText, result) != newText) {
-        alert("Changeset Generation Failed");
+        alert("Changeset Generation Failed! Application yields '" + 
+              applyChangeset(oldText, result) + "' instead of '" + newText + "'");
     }
+
     return optimizeChangeset(oldText, str + '$' + pot);
 }
+
 
 function mergeChangeset(base, cs1, cs2) {
   var merged = '';
