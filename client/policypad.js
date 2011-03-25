@@ -206,13 +206,12 @@ function optimizeChangeset(oldText, changeset) {
   
   for (var part in parsed.ops) {
     if (prevPart && part.op == '+') {
-      //TODO: optimize from left to right also
       textPart = text.substring(0, prevPart.len);
       potPart = parsed.bank.substring(0, part.len);
       var i = textPart.length-1;
       var j = potPart.length-1;
       var newlines = 0;
-      for (; textPart[i] == potPart[j] && (i > 0) && (j > 0); i--, j--)
+      for (; textPart[i] == potPart[j] && (i >= 0) && (j > 0); i--, j--)
         if (textPart[i] == '\n')
           newlines++;
       len = textPart.length - 1 - i;
@@ -220,13 +219,32 @@ function optimizeChangeset(oldText, changeset) {
       prevPart.newlines -= newlines;
       part.len -= len;
       part.newlines -= newlines;
-      optimized = append_part(optimized, prevPart);
-      optimized = append_part(optimized, part);
-      newPart = {op: '=', len: len, newlines: newlines, attribs: []};
-      optimized = append_part(optimized, newPart);
+      newPartPost = {op: '=', len: len, newlines: newlines, attribs: []};
+      textPart = textPart.substring(0, i);
+      potPart = potPart.substring(0, j);
 
-      pot += parsed.bank.substring(0, part.len);
-      parsed.bank = parsed.bank.substring(part.len + len);
+      i = 0;
+      newlines = 0;
+      for (i = 0; textPart[i] == potPart[i] && (i < textPart.length) && (i < potPart.length); i++)
+        if (textPart[i] == '\n')
+          newlines++;
+      if (i > 0) {
+        prevPart.len -= i;
+        prevPart.newlines -= newlines;
+        part.len -= i;
+        part.newlines -= newlines;
+        newPart = {op: '=', len: i, newlines: newlines, attribs: []};
+        optimized = append_part(optimized, newPart);
+      }
+
+      if (prevPart.len)
+        optimized = append_part(optimized, prevPart);
+      optimized = append_part(optimized, part);
+      if (newPartPost.len)
+        optimized = append_part(optimized, newPartPost);
+
+      pot += parsed.bank.substring(i, i + part.len);
+      parsed.bank = parsed.bank.substring(i + part.len + len);
       prevPart = null;
     } else {
       if (prevPart) {
@@ -560,6 +578,8 @@ function mergeChangeset(base, cs1, cs2) {
     } else if (part1.op == '+' && part2.op == '+') {
       // + +
       //append first addition
+      //FIXME: does not product an optimial changeset (two additions), merge the
+      //parts first (only if attribs are the same)
       append_part(part1);
       mergedBank += parsed1.bank.substring(0, part1.len);
       newlen += part1.len;
