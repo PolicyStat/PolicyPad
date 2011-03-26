@@ -193,7 +193,7 @@ function optimizeChangeset(oldText, changeset) {
         prevPart = part;
       }
     }
-    if (prevPart)
+    if (prevPart && prevPart.op != "=")
       collapsed = append_part(collapsed, prevPart);
     collapsed += "$" + parsed.bank;
 
