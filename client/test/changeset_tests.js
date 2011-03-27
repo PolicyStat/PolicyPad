@@ -68,6 +68,7 @@ test('simple deletion', function() {
 test('HTML-specific deletion', function() {
     changesetTest('<p>Hello, World!</p>', '<p>Hello!</p>', 'Simple deletion');
     changesetTest('<p>Hello!</p><p>World!</p><p>Foobar</p>', '<p>Hello!</p><p>Foobar</p>', 'Tag deletion');
+    changesetTest('<table><tbody><tr><td></td></tr></tbody></table>\n\n', '<br />\n\n', 'Remove blank table');
 });
 
 /**

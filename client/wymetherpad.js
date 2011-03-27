@@ -36,39 +36,19 @@ WymEtherpad.prototype.init = function() {
 
   var etherpad = this;
 
-  //Get our initial data
-  this.status("Connecting to server...");
-  this.getPadValues(this._options.host || window.location.host, this._options.padId, function(clientVars) {
-    //Create our client, using the data from clientVars
-    etherpad._clientVars = clientVars;
-    userInfo = {
-      userId:    clientVars.userId,
-      name:      etherpad._options.username || clientVars.username,
-      ip:        clientVars.clientIp,
-      colorId:   clientVars.userColor,
-      userAgent: padutils.uaDisplay(clientVars.userAgent)
-    };
-    etherpad._client = getCollabClient(etherpad, clientVars.collab_client_vars, userInfo, { colorPalette: clientVars.colorPalette });
-    etherpad._client.setOnUserJoin(          function(userInfo)               {etherpad.onUserJoin(userInfo);});
-    etherpad._client.setOnUserLeave(         function(userInfo)               {etherpad.onUserLeave(userInfo);});
-    etherpad._client.setOnUpdateUserInfo(    function(userInfo)               {etherpad.onUpdateUserInfo(userInfo);});
-    etherpad._client.setOnChannelStateChange(function(channelState, moreInfo) {etherpad.onChannelStateChange(channelState,	moreInfo);});
-    etherpad._client.setOnClientMessage(     function(payload)                {etherpad.onClientMessage(payload);});
-    etherpad._client.setOnInternalAction(    function(str)                    {etherpad.onInternalAction(str);});
-    etherpad._client.setOnConnectionTrouble( function(str)                    {etherpad.onConnectionTrouble(str);});
-    etherpad._client.setOnServerMessage(     function(payload)                {etherpad.onServerMessage(payload);});
-  });
-  
+  //connect to EtherPad
+  this._connectAttempts = 0;
+  this.connect();
 };
 
 //BEGIN public interface
 
 WymEtherpad.prototype.submitChanges = function() {
   if (!this._changecb || this._doc.hasPendingChangeset() || !this._doc.isModified()) {
-    this.log("Key event ignored");
+    //this.log("Key event ignored");
     return;
   }
-  this.log("Key event");
+  //this.log("Key event");
   this._changecb();
 }
 
@@ -88,8 +68,42 @@ WymEtherpad.prototype.log = function(msg) {
     funcLog(msg);
 }
 
-WymEtherpad.prototype.status = function(msg) {
-  this._callbacks.status(msg);
+WymEtherpad.prototype.status = function(msg, persistent) {
+  this._callbacks.status(msg, persistent);
+}
+
+WymEtherpad.prototype.connect = function() {
+  var etherpad = this;
+
+  //Get our initial data
+  if (this._connectAttempts == 0) {
+    this.status("Connecting to server...");
+  } else {
+    this.status("Reconnecting to server...");
+  }
+
+  this.getPadValues(this._options.host || window.location.host, this._options.padId, function(clientVars) {
+    //Create our client, using the data from clientVars
+    etherpad._clientVars = clientVars;
+    userInfo = {
+      userId:    clientVars.userId,
+      name:      etherpad._options.username || clientVars.username,
+      ip:        clientVars.clientIp,
+      colorId:   clientVars.userColor,
+      userAgent: padutils.uaDisplay(clientVars.userAgent)
+    };
+    etherpad._client = getCollabClient(etherpad, clientVars.collab_client_vars, userInfo, { colorPalette: clientVars.colorPalette });
+    etherpad._client.setOnUserJoin(          function(userInfo)               {etherpad.onUserJoin(userInfo);});
+    etherpad._client.setOnUserLeave(         function(userInfo)               {etherpad.onUserLeave(userInfo);});
+    etherpad._client.setOnUpdateUserInfo(    function(userInfo)               {etherpad.onUpdateUserInfo(userInfo);});
+    etherpad._client.setOnChannelStateChange(function(channelState, moreInfo) {etherpad.onChannelStateChange(channelState,	moreInfo);});
+    etherpad._client.setOnClientMessage(     function(payload)                {etherpad.onClientMessage(payload);});
+    etherpad._client.setOnInternalAction(    function(str)                    {etherpad.onInternalAction(str);});
+    etherpad._client.setOnConnectionTrouble( function(str)                    {etherpad.onConnectionTrouble(str);});
+    etherpad._client.setOnServerMessage(     function(payload)                {etherpad.onServerMessage(payload);});
+
+    etherpad._connectAttempts++;
+  });
 }
 
 WymEtherpad.prototype.getPadValues = function(host, padId, cb) {
@@ -130,7 +144,6 @@ WymEtherpad.prototype.setBaseAttributedText = function(initialText, apool) {
 
   //Create our document wrapper around this._etherpad.html to track changes
   this._doc = new EtherpadDocument(function(val){ return etherpad._callbacks.html(val) }, initialText);
-  this.status("Waiting for user listing...");
 }
 
 WymEtherpad.prototype.setUserChangeNotificationCallback = function(cb) {
@@ -145,9 +158,11 @@ WymEtherpad.prototype.prepareUserChangeset = function() {
     changeset: changeset,
     apool: {
             numToAttrib: {0: ["author", this._clientVars.userId]},
-            nextNum: 1} //TODO: populate with real data
+            nextNum: 1} 
   };
   this.log(JSON.stringify(payload))
+  if (changeset != null)
+    this.status("Sending changes...", true);
   return payload;
 }
 
@@ -195,12 +210,12 @@ WymEtherpad.prototype.onChannelStateChange = function(channelState,	moreInfo) {
 WymEtherpad.prototype.onClientMessage = function(payload) {
   this.log("onClientMessage(" + JSON.stringify(payload) + ")");
 
-  if (!this._initialized && payload.type == "padoptions") {
-    if (this._client.getConnectedUsers().length == 1 && this._options.initialText) {
+  if (payload.type == "padoptions") {
+    if (!this._initialized && this._client.getConnectedUsers().length == 1 && this._options.initialText) {
       this._callbacks.html(this._options.initialText);
-      this._initialized = true;
       this.submitChanges();
     } 
+    this._initialized = true;
     this.status("Connected");
   }
 
@@ -212,6 +227,11 @@ WymEtherpad.prototype.onInternalAction = function(str) {
 
 WymEtherpad.prototype.onConnectionTrouble = function(str) {
   this.log("onConnectionTrouble(" + str + ")");
+  if (str == "OK") {
+    this.status('');
+  } else if (str == "SLOW") {
+    this.connect();
+  }
 }
 
 WymEtherpad.prototype.onServerMessage = function(payload) {
