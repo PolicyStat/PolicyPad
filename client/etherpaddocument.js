@@ -25,7 +25,12 @@
  * parameter is omitted, the current html value is returned
  */
 function EtherpadDocument(func, initialText) {
-  this._func = func;
+  this._func = function(html) {
+    if (html === undefined || !html) {
+      return func() + "\n\n";
+    }
+    func(html.substring(0, html.length-2));
+  };
   //TODO: This class needs to track more than just HTML. In Etherpad, the text
   //consists of both the text and the mapping of text to attributes.  Etherpad
   //also tracks an attribute pool (apool) which provides formatting information,
@@ -58,8 +63,8 @@ EtherpadDocument.prototype.applyChangeset = function(changeset, apool) {
     //2. Merge the two changesets
     var merged = mergeChangeset(this._prevHtml, baseDiff, changeset);
 
-    //3. Apply merged to func()
-    var newHtml = applyChangeset(this._func(), merged);
+    //3. Apply merged to prevHtml
+    var newHtml = applyChangeset(this._prevHtml, merged);
     this._func(newHtml);
     
     //4. Apply changeset to prevHtml
