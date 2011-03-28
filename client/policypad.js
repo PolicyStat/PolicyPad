@@ -423,7 +423,14 @@ function generateChangeset(oldText, newText){
              * got deletions from the previous step, in which case dump all the skip
              * operators into the changeset, followed by the deletion operators
              */
-            currentText = out.n[i].text + (i >= nSpace.length ? '' : nSpace[i]);
+            currentText = out.n[i].text;
+            if (i + 1 < out.n.length && out.n[i + 1].text == null && 
+                    out.n[i].row >= oSpace.length) {
+                dels = '*0+1' + dels;
+                pot += ' ';
+            } else {
+                currentText += (i >= nSpace.length ? '' : nSpace[i]);
+            }
             if (dels == '') {
                 potentialStr += _newlines(currentText) + '=' + packNum(currentText.length);
             } else {
@@ -434,14 +441,16 @@ function generateChangeset(oldText, newText){
         }
     }
 
-    result = optimizeChangeset(oldText, str + '$' + pot);
+    str = str + '$' + pot;
+
+    result = optimizeChangeset(oldText, str);
 
     if (applyChangeset(oldText, result) != newText) {
         alert("Changeset Generation Failed! Application yields '" + 
               applyChangeset(oldText, result) + "' instead of '" + newText + "'");
     }
 
-    return optimizeChangeset(oldText, str + '$' + pot);
+    return str; //optimizeChangeset(oldText, str);
 }
 
 
