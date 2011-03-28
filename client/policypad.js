@@ -450,7 +450,7 @@ function generateChangeset(oldText, newText){
               applyChangeset(oldText, result) + "' instead of '" + newText + "'");
     }
 
-    return str; //optimizeChangeset(oldText, str);
+    return optimizeChangeset(oldText, str);
 }
 
 
