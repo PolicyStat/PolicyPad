@@ -455,6 +455,7 @@ function generateChangeset(oldText, newText){
 
 
 function mergeChangeset(base, cs1, cs2) {
+  var baseDoc = base;
   var merged = '';
   var mergedBank = '';
   var pos = 0;
@@ -473,7 +474,7 @@ function mergeChangeset(base, cs1, cs2) {
     if (part.op == '+') {
         part.newlines -= bank.substring(0, len).split('\n').length-1;
     } else {
-        part.newlines -= base.substring(pos, len).split('\n').length-1;
+        part.newlines -= baseDoc.substring(pos, len).split('\n').length-1;
     }
     part.len -= len;
   }
@@ -533,7 +534,7 @@ function mergeChangeset(base, cs1, cs2) {
           rem_len(part1, parsed1.bank, dPos);
           iterate2();
         }
-        base = base.substring(dPos);
+        baseDoc = baseDoc.substring(dPos);
         pos += dPos;
         newlen += dPos;
         continue;
@@ -565,7 +566,7 @@ function mergeChangeset(base, cs1, cs2) {
         if (part2.len <= part1.len) {
           append_part(part2);
           //newlen -= part2.len;
-          base = base.substring(part2.len);
+          baseDoc = baseDoc.substring(part2.len);
           rem_len(part1, parsed1.bank, part2.len);
           if (!part1.len)
             iterate1();
@@ -623,7 +624,7 @@ function mergeChangeset(base, cs1, cs2) {
       //remove the first part, which is defined to be greater than or equal to
       //the length of the second, so we can just throw away part2.
       append_part(part1);
-      base = base.substring(part1.len);
+      baseDoc = baseDoc.substring(part1.len);
       iterate1();
       iterate2();
 
@@ -655,7 +656,7 @@ function mergeChangeset(base, cs1, cs2) {
 
       //part1 - removal
       append_part(part1);
-      base = base.substring(part1.len);
+      baseDoc = baseDoc.substring(part1.len);
       iterate1();
 
       //part2 - addition
@@ -694,7 +695,7 @@ function mergeChangeset(base, cs1, cs2) {
       case '=':
         append_part(part1);
         newlen += part1.len;
-        base = base.substring(part1.len);
+        baseDoc = baseDoc.substring(part1.len);
         break;
       case '+':
         append_part(part1);
@@ -704,15 +705,15 @@ function mergeChangeset(base, cs1, cs2) {
         break;
       case '-':
         append_part(part1);
-        base = base.substring(part1.len);
+        baseDoc = baseDoc.substring(part1.len);
         break;
       default:
         return null;
     }
     iterate1();
   }
-  //addon remaining characters in the base document
-  newlen += base.length;
+  //addon remaining characters in the baseDoc document
+  newlen += baseDoc.length;
 
   //assemble the changeset
   var prefix = "Z:" + packNum(oldlen);
@@ -725,5 +726,5 @@ function mergeChangeset(base, cs1, cs2) {
 
   merged = prefix + merged + "$" + mergedBank;
 
-  return merged;
+  return optimizeChangeset(base, merged);
 }
