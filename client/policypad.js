@@ -594,8 +594,6 @@ function mergeChangeset(base, cs1, cs2) {
     } else if (part1.op == '+' && part2.op == '+') {
       // + +
       //append first addition
-      //FIXME: does not product an optimial changeset (two additions), merge the
-      //parts first (only if attribs are the same)
       append_part(part1);
       mergedBank += parsed1.bank.substring(0, part1.len);
       newlen += part1.len;
@@ -605,6 +603,8 @@ function mergeChangeset(base, cs1, cs2) {
       mergedBank += parsed2.bank.substring(0, part2.len);
       newlen += part2.len;
       iterate2();
+      //we need to run this through optimizeChangeset afterwards
+
     } else if (part1.op == '-' && part2.op == '-') {
       // - -
       
