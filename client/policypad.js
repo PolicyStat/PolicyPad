@@ -284,7 +284,7 @@ function optimizeChangeset(oldText, changeset) {
 
   do {
     origChangeset = changeset;
-    $.each(optimizers, function(optimizer) {
+    jQuery.each(optimizers, function(i, optimizer) {
       changeset = optimizer(changeset);
     });
   } while (changeset != origChangeset);
