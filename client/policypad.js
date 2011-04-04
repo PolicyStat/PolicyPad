@@ -59,7 +59,7 @@ function parseChangeset(changeset) {
     var iterator = this;
 
     if (!this.hasNext())
-      throw StopIteration;
+      return null;
 
     var nextPart = function() {
       return {op: iterator._ops.shift(), len: convBase36(iterator._lens.shift())};
@@ -120,7 +120,7 @@ function applyChangeset(oldText, changeset) {
 
   //TODO: update attribs
   var i = 0;
-  for (var part in parsed.ops) {
+  for (var part = parsed.ops.next(); part != null; part = parsed.ops.next()) {
     switch (part.op) {
       case '=':
         change = oldText.substring(i, i + part.len);
@@ -142,7 +142,7 @@ function applyChangeset(oldText, changeset) {
         break;
     }
   }
-  
+ 
   //The rest of the document is unchanged
   res += oldText.substring(i);
 
@@ -181,7 +181,7 @@ function optimizeChangeset(oldText, changeset) {
     parsed = parseChangeset(changeset);
     collapsed = parsed.prefix;
     var prevPart = null;
-    for (var part in parsed.ops) {
+    for (var part = parsed.ops.next(); part != null; part = parsed.ops.next()) {
       if (prevPart && prevPart.op == part.op && compareAttribs(prevPart.attribs, part.attribs)) {
         prevPart.len += part.len;
         prevPart.newlines += part.newlines;
@@ -207,7 +207,7 @@ function optimizeChangeset(oldText, changeset) {
     var prevPart = null;
     var text = oldText;
     
-    for (var part in parsed.ops) {
+    for (var part = parsed.ops.next(); part != null; part = parsed.ops.next()) {
       if (prevPart && part.op == '+') {
         textPart = text.substring(0, prevPart.len);
         potPart = parsed.bank.substring(0, part.len);
