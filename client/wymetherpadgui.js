@@ -3,6 +3,7 @@ function WymEtherpadGUI(guioptions, options, wym) {
   this._wym = wym
   var etherpad = new WymEtherpad(options, this);
   this._etherpad = etherpad;
+  this._sel = null;
   //funcStatus: function(msg) { return wym.status(msg); },
   //create the GUI
   var initial_options = {
@@ -75,10 +76,46 @@ WymEtherpadGUI.prototype.setTextEnabled = function(enabled) {
   //TODO: implement
 }
 
+function wym_window(wym) {
+  var iframe = wym._iframe;
+  var win = (iframe.contentDocument && iframe.contentDocument.defaultView) ?
+    iframe.contentDocument.defaultView : iframe.contentWindow;
+  return win;
+}
+
 WymEtherpadGUI.prototype.html = function(val) {
-  if (val === undefined)
+  if (val === undefined) {
     return this._wym.xhtml().replace(/\r/g, "");
-  this._wym.html(val)
+  }
+
+  sel = this._wym.selection();
+  win = wym_window(this._wym);
+  serialized = rangy.serializeSelection(sel, true);
+  this.status('selection: ' + serialized);
+  this._wym.html(val);
+  if (sel)
+    try {
+      rangy.deserializeSelection(serialized, undefined, win);
+      //rangy.restoreSelection(sel, true);
+    } catch (e) {
+      //this.status("Failed to restore selection");
+    }
+
+/*
+  var sel = rangy.saveSelection();
+  //var root = jQuery(this._wym._doc.body)[0];
+  var root = null;
+  //var serialized = rangy.serializeSelection(null, true, root);
+  var serialized = rangy.serializeSelection(sel, true);
+  this.status(serialized);
+  this._wym.html(val);
+  try {
+    sel = rangy.deserializeSelection(serialized, root);
+  } catch (e) {
+    //this.status("selection broke: " + serialized);
+  }
+  //rangy.restoreSelection(sel, true);
+  */
 }
 
 WymEtherpadGUI.prototype.refreshUsers = function() {

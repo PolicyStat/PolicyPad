@@ -5,8 +5,12 @@
 <title>WYMeditor</title>
 <!-- jQuery library is required, see http://jquery.com/ -->
 <script type="text/javascript" src="wymeditor/jquery/jquery.js"></script>
+<script type="text/javascript" src="../rangy/rangy-core.js"></script>
+<script type="text/javascript" src="../rangy/rangy-selectionsaverestore.js"></script>
+<script type="text/javascript" src="../rangy/rangy-serializer.js"></script>
 <!-- WYMeditor main JS file, minified version -->
 <script type="text/javascript" src="wymeditor/wymeditor/jquery.wymeditor.js"></script>
+<script type="text/javascript" src="wymeditor/wymeditor/plugins/rangy/jquery.wymeditor.rangy.js"></script>
 
 <script type="text/javascript" src="http://kevinwells.homeip.net:8082/comet/js/client.js"></script>
 <script type="text/javascript" src="http://kevinwells.homeip.net:8082/static/js/collab_client.js"></script>
@@ -54,6 +58,7 @@ var $_GET = getQueryParams(document.location.search);
 */
 
 jQuery(function() {
+  rangy.init();
   jQuery('.wymeditor').wymeditor({
     html: '', //This can override
     postInit: function(wym) {
@@ -89,6 +94,29 @@ function btnRefresh_onclick() {
     
 }
 
+function wym_window(wym) {
+  var iframe = wym._iframe;
+  var win = (iframe.contentDocument && iframe.contentDocument.defaultView) ?
+    iframe.contentDocument.defaultView : iframe.contentWindow;
+  return win;
+}
+
+function btnSave_onclick() {
+    var wym = jQuery.wymeditors(0);
+    var sel = wym.selection();
+   // var sel = rangy.getSelection();
+    var serialized = rangy.serializeSelection(sel, true);
+    //debug_log("Selection: " + serialized);
+    wym.sel = serialized;
+    //wym.sel = sel;
+}
+
+function btnRestore_onclick() {
+    var wym = jQuery.wymeditors(0);
+
+    //rangy.restoreSelection(wym.sel);
+    rangy.deserializeSelection(wym.sel, undefined, wym_window(wym));
+}
 
 
 </script>
@@ -103,8 +131,11 @@ function btnRefresh_onclick() {
 <!--input type="submit" class="wymupdate" /-->
 <p> Connected Users: </p>
 <textarea id="userlist" rows="10" cols="40" value="Hello" readonly="true" class="wym_skin_default"></textarea>
-<br>
+<br />
 <input type="button" name="btnRefresh" value="Refresh" onclick="btnRefresh_onclick()" />
+<br />
+<input type="button" name="btnSave" value="Save Selection" onclick="btnSave_onclick()" />
+<input type="button" name="btnRestore" value="Restore Selection" onclick="btnRestore_onclick()" />
 </form>
     
 Debug Output: <div id="debug"></div>
