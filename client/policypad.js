@@ -308,7 +308,7 @@ function generateChangeset(oldText, newText){
         if (newlines == null) {
             return '';
         }
-        return '|' + newlines.length;
+        return '|' + packNum(newlines.length);
     }
 
     function _diff(o, n){
