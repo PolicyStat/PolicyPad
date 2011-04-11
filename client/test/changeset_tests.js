@@ -48,6 +48,11 @@ test('HTML-specific insertion', function() {
     changesetTest('<p>a</p>\n<p>b</p\n<p>c</p>\n', '<p>a</p>\n<p>b</p\n<p>q</p>\n<p>c</p>\n', 'Insert paragraph on new line');
     changesetTest('<p>a \n b</p>', '<p>a \nc\n b</p>', 'Insert word on new line with spaces');
     changesetTest('<p>Hello</p>', '<p>Hello</p><p>There</p>', 'Append paragraph');
+    changesetTest('<p>a</p>\n\n<table>\n\n<tbody>\n<tr>\n<td></td></tr>\n<tr>\n<td></td></tr></tbody></table>\n\n',
+                  '<p>a</p>\n\n<table>\n\n<tbody>\n<tr>\n<td>a</td></tr>\n<tr>\n<td></td></tr></tbody></table>\n\n',
+                  'Broke IE8');
+ 
+
 });
 
 
