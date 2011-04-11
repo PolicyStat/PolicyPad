@@ -52,7 +52,10 @@ function parseChangeset(changeset) {
   function OpIterator(changeset) {
     this._lens = changeset.split(/[|=+*-]/);
     this._ops = changeset.split(/\w+/);
-    this._lens.shift();
+    //conditionals added because IE doesn't know how to regex split strings
+    if (this._lens != null && this._lens.length > 0 && this._lens[0] == "")
+      this._lens.shift();
+      if (this._ops != null && this._ops.length > 0 && this._ops[this._ops.length-1] == "")
     this._ops.pop();
   }
   OpIterator.prototype.next = function() {
@@ -446,11 +449,12 @@ function generateChangeset(oldText, newText){
     result = optimizeChangeset(oldText, str);
 
     if (applyChangeset(oldText, result) != newText) {
-        alert("Changeset Generation Failed! Application yields '" + 
+      func = alert;
+        func("Changeset Generation Failed! Application yields '" + 
               applyChangeset(oldText, result) + "' instead of '" + newText + "'");
     }
 
-    return optimizeChangeset(oldText, str);
+    return result;
 }
 
 

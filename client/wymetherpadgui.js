@@ -76,7 +76,9 @@ WymEtherpadGUI.prototype.setTextEnabled = function(enabled) {
 }
 
 WymEtherpadGUI.prototype.html = function(val) {
-  return this._wym.html(val)
+  if (val === undefined)
+    return this._wym.xhtml().replace(/\r/g, "");
+  this._wym.html(val)
 }
 
 WymEtherpadGUI.prototype.refreshUsers = function() {
