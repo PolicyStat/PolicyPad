@@ -27,12 +27,20 @@ function make_func(initial) {
   }
 }
 
+function make_no_set(func) {
+  return function(html) {
+    ok(html === undefined, "Xhtml modified");
+    return func(html);
+  };
+}
+
 test('Starting State', function() {
   var func = function(html) {
-    ok(html === undefined, "Unexpected change to html");
-    return "<p>Hello World</p>";
+    var val = "<p>Hello World</p>";
+    ok(html === undefined || html == val, "Unexpected change to html");
+    return val;
   };
-  var doc = new EtherpadDocument(func, {text: func() + "\n\n"});
+  var doc = new EtherpadDocument(func, make_no_set(func), {text: func() + "\n\n"});
   equals(doc.isModified(), false);
   equals(doc.hasPendingChangeset(), false);
 });
@@ -42,7 +50,7 @@ test('Simple Outbound Change', function() {
   var new_html = "<p>Hello Brave New World</p>";
 
   var func = make_func(old_html);
-  var doc = new EtherpadDocument(func, {text: func() + "\n\n"});
+  var doc = new EtherpadDocument(func, make_no_set(func), {text: func() + "\n\n"});
   func(new_html);
   equals(doc.isModified(), true);
   equals(doc.hasPendingChangeset(), false);
@@ -64,7 +72,7 @@ test('Simple Inbound Change', function() {
   var new_html = "<p>Hello Brave New World</p>";
 
   var func = make_func(old_html);
-  var doc = new EtherpadDocument(func, {text: func() + "\n\n"});
+  var doc = new EtherpadDocument(func, make_no_set(func), {text: func() + "\n\n"});
 
   doc.applyChangeset(generateChangeset(old_html + "\n\n", new_html + "\n\n"));
 
@@ -81,10 +89,11 @@ test('Inbound change with unprepared outbound change', function() {
   var merged_html =    "<p>Hello My World!</p>";
   
   var func = make_func(old_html);
-  var doc = new EtherpadDocument(func, {text: func() + "\n\n"});
+  var doc = new EtherpadDocument(func, make_no_set(func), {text: func() + "\n\n"});
 
   //update our document
   func(my_new_html);
+  equal(my_new_html, func());
 
   //uhoh, changes are coming from the server too
   var their_changeset = generateChangeset(old_html + "\n\n", their_new_html + "\n\n");
@@ -92,6 +101,7 @@ test('Inbound change with unprepared outbound change', function() {
 
   //make sure we are modified, _prevHtml has been updated, and our model has the
   //merged changes
+  equal(func(), merged_html);
   equal(doc.isModified(), true);
   equal(doc.hasPendingChangeset(), false);
   equal(doc._prevHtml, their_new_html + "\n\n");

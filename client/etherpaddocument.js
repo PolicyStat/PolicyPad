@@ -24,51 +24,66 @@
  * called with a parameter, the html value should be set, and when the 
  * parameter is omitted, the current html value is returned
  */
-function EtherpadDocument(func, initialText) {
-  this._func = function(html) {
-    if (html === undefined || !html) {
-      return func() + "\n\n";
-    }
-    func(html.substring(0, html.length-2));
-  };
+function EtherpadDocument(funcHtml, funcXhtml, initialText) {
+  handleNewlines = function(func) {
+    return function(html) {
+      if (html === undefined || !html)
+        return func() + "\n\n";
+      func(html.substring(0, html.length-2));
+    };
+  }
+
+  this._funcHtml = handleNewlines(funcHtml);
+  this._funcXhtml = handleNewlines(funcXhtml);
+
   //TODO: This class needs to track more than just HTML. In Etherpad, the text
   //consists of both the text and the mapping of text to attributes.  Etherpad
   //also tracks an attribute pool (apool) which provides formatting information,
   //but more importantly, authorship information.  Changeset manipulation needs
   //to manipulate both the text and the text/apool mappings.
-  this._prevHtml = initialText.text;
+  this._funcHtml(initialText.text);
+  this._prevHtml = this._funcHtml();
+  this._prevXhtml = this._funcXhtml();
   this._pendingChangeset = null;
 }
 
 EtherpadDocument.prototype.generateChangeset = function() {
-  if (this._pendingChangeset || this._prevHtml == this._func())
+  if (this._pendingChangeset || !this.isModified())
     return null;
-  this._pendingChangeset = generateChangeset(this._prevHtml, this._func());
+  this._pendingChangeset = generateChangeset(this._prevXhtml, this._funcXhtml());
+  this._pendingHtml = this._funcHtml();
   return this._pendingChangeset;
 }
 
 EtherpadDocument.prototype.applyChangeset = function(changeset, apool) {
-  if (this._prevHtml == this._func()) {
+  if (!this.isModified()) {
     //no need to merge changes, just apply the changeset to our base
-    var newhtml = applyChangeset(this._prevHtml, changeset);
-    this._func(newhtml);
-    this._prevHtml = newhtml;
+    var newXhtml = applyChangeset(this._prevXhtml, changeset);
+    this._funcHtml(newXhtml);
+    this._prevHtml = this._funcHtml();
+    this._prevXhtml = newXhtml;
   }
   else {
     //We have local uncommitted changes, this merge is a bit more complicated
 
     //1. Generate changeset between html and prevHtml
-    var baseDiff = generateChangeset(this._prevHtml, this._func());
+    var baseDiff = generateChangeset(this._prevXhtml, this._funcXhtml());
 
     //2. Merge the two changesets
-    var merged = mergeChangeset(this._prevHtml, baseDiff, changeset);
+    var merged = mergeChangeset(this._prevXhtml, baseDiff, changeset);
 
-    //3. Apply merged to prevHtml
-    var newHtml = applyChangeset(this._prevHtml, merged);
-    this._func(newHtml);
-    
-    //4. Apply changeset to prevHtml
-    this._prevHtml = applyChangeset(this._prevHtml, changeset);
+    //3. Apply changeset to prevHtml/prevXhtml
+    //FIXME we can't get prevHtml from funcHtml without first setting the merged
+    //document.  In order to make this work with the two functions, we need to
+    //be able to grab both selections
+    var oldXhtml = this._prevXhtml;
+    this._prevXhtml = applyChangeset(this._prevXhtml, changeset);
+    this._funcHtml(this._prevXhtml);
+    this._prevHtml = this._funcHtml();
+
+    //4. Apply merged to current HTML
+    var newXhtml = applyChangeset(oldXhtml, merged);
+    this._funcHtml(newXhtml);
   }
 
   return;
@@ -79,11 +94,13 @@ EtherpadDocument.prototype.hasPendingChangeset = function() {
 }
 
 EtherpadDocument.prototype.changesetAccepted = function() {
-  this._prevHtml = applyChangeset(this._prevHtml, this._pendingChangeset);
+  this._prevHtml = this._pendingHtml;
+  this._prevXhtml = applyChangeset(this._prevXhtml, this._pendingChangeset);
   this._pendingChangeset = null;
 }
 
 EtherpadDocument.prototype.isModified = function() {
-  return this._prevHtml != this._func();
+  return this._prevHtml != this._funcHtml()
+    && this._prevXhtml != this._funcXhtml();
 }
 

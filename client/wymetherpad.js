@@ -140,10 +140,11 @@ WymEtherpad.prototype.setBaseAttributedText = function(initialText, apool) {
   var etherpad = this;
 
   this.log("setBaseAttributedText(" + JSON.stringify(initialText) + ", " + JSON.stringify(apool) + ")");
-  this._callbacks.html(initialText.text.substring(0, initialText.text.length-2));
 
   //Create our document wrapper around this._etherpad.html to track changes
-  this._doc = new EtherpadDocument(function(val){ return etherpad._callbacks.html(val) }, initialText);
+  this._doc = new EtherpadDocument(function(val){ return etherpad._callbacks.html(val) },
+                                   function()   { return etherpad._callbacks.xhtml()   },
+                                   initialText);
 }
 
 WymEtherpad.prototype.setUserChangeNotificationCallback = function(cb) {

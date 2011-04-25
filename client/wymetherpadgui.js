@@ -50,6 +50,10 @@ function WymEtherpadGUI(guioptions, options, wym) {
 }
 
 //BEGIN WymEtherpadCallbacks interface
+// status(msg, persistent)
+// setTextEnabled(enabled)
+// html([val])
+// refreshUsers()
 
 WymEtherpadGUI.prototype.status = function(msg, persistent) {
   var etherpadgui = this;
@@ -76,46 +80,35 @@ WymEtherpadGUI.prototype.setTextEnabled = function(enabled) {
   //TODO: implement
 }
 
-function wym_window(wym) {
-  var iframe = wym._iframe;
-  var win = (iframe.contentDocument && iframe.contentDocument.defaultView) ?
-    iframe.contentDocument.defaultView : iframe.contentWindow;
-  return win;
+WymEtherpadGUI.prototype.xhtml = function() {
+  return this._wym.xhtml().replace(/\r/g, "");
 }
 
 WymEtherpadGUI.prototype.html = function(val) {
-  if (val === undefined) {
-    return this._wym.xhtml().replace(/\r/g, "");
+  //either return the document's current html
+  if (val === undefined)
+    return this._wym.html();
+
+  //or set the value of the field, keeping the same selection
+  wym_window = function(wym) {
+    var iframe = wym._iframe;
+    var win = (iframe.contentDocument && iframe.contentDocument.defaultView) ?
+      iframe.contentDocument.defaultView : iframe.contentWindow;
+    return win;
   }
 
-  sel = this._wym.selection();
-  win = wym_window(this._wym);
+  var sel = this._wym.selection();
+  var win = wym_window(this._wym);
   serialized = rangy.serializeSelection(sel, true);
-  this.status('selection: ' + serialized);
+  //this.status('selection: ' + serialized);
   this._wym.html(val);
-  if (sel)
+  if (sel) {
     try {
       rangy.deserializeSelection(serialized, undefined, win);
-      //rangy.restoreSelection(sel, true);
     } catch (e) {
-      //this.status("Failed to restore selection");
+      this.status("Failed to restore selection");
     }
-
-/*
-  var sel = rangy.saveSelection();
-  //var root = jQuery(this._wym._doc.body)[0];
-  var root = null;
-  //var serialized = rangy.serializeSelection(null, true, root);
-  var serialized = rangy.serializeSelection(sel, true);
-  this.status(serialized);
-  this._wym.html(val);
-  try {
-    sel = rangy.deserializeSelection(serialized, root);
-  } catch (e) {
-    //this.status("selection broke: " + serialized);
   }
-  //rangy.restoreSelection(sel, true);
-  */
 }
 
 WymEtherpadGUI.prototype.refreshUsers = function() {

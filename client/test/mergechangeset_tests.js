@@ -42,6 +42,8 @@ test('mutual additions', function() {
   equals(applyChangeset('Append to first', mergeChangeset('Append to first', 'Z:f>3=6*0+3$ing', 'Z:f>2=6*0+2$ed')), 'Appendinged to first', 'Append to first/Appendinged to first');
   equals(applyChangeset('word', mergeChangeset('word', 'Z:4>3=4*0+3$add', 'Z:4>4=4*0+4$more')), 'wordaddmore', 'word/wordaddmore');
   equals(applyChangeset('word', mergeChangeset('word', 'Z:4>4=4*0+4$more', 'Z:4>3=4*0+3$add')), 'wordmoreadd', 'word/wordmoreadd');
+  equals(applyChangeset('word', mergeChangeset('word', 'Z:4>4=4*0+4$more', 'Z:4>3=4*0+3$add')), 'wordmoreadd', 'word/wordmoreadd');
+  equals(applyChangeset('<p>Hello World</p>', mergeChangeset('<p>Hello World</p>', 'Z:i>3=9*0+3$My ', 'Z:i>1=d-1*0+2$d!')), '<p>Hello My World!</p>', '<p>Hello World</p>/<p>Hello My World!</p>');
 });
 
 test('mutual removals', function() {
