@@ -7,15 +7,6 @@ function WymEtherpadGUI(guioptions, options, wym) {
   //funcStatus: function(msg) { return wym.status(msg); },
   //create the GUI
   var initial_options = {
-    //sUrl:          wym._options.basePath + "plugins/tidy/tidy.php",
-    sButtonHtml:     "<li class='wym_tools_strong'>"
-                     + "<a name='AboutEtherpad' href='#'"
-                     //+ " style='background-image:"
-                     //+ " url(" + wym._options.basePath + "plugins/tidy/wand.png)'>"
-                     + ">"
-                     + "About Etherpad"
-                     + "</a></li>",
-    sButtonSelector: "li.wym_tools_strong a",
     doStatus: true
   };
   this._options = jQuery.extend(initial_options, guioptions);
@@ -31,21 +22,6 @@ function WymEtherpadGUI(guioptions, options, wym) {
   //register keyup handler
   //jQuery(this._doc).bind("keyup", handleUIEvent("keyup"));
 
-  //Add button to toolbar
-  jQuery(wym._box).find(wym._options.toolsSelector + wym._options.toolsListSelector).append(this._options.sButtonHtml);
-
-  //handle click event
-  jQuery(wym._box).find(this._options.sButtonSelector).click(function() {
-    etherpad.testGuiEvent();
-    return(false);
-  });
-  
-  
-  //example code
-  // jQuery(this._box).find(this._options.toolSelector).hover(
-  //     function() { wym.status('hover'); },
-  //     function() { wym.status('hi'); }
-  // );
   etherpad.init();
 }
 

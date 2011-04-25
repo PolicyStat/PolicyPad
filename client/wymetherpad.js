@@ -52,10 +52,6 @@ WymEtherpad.prototype.submitChanges = function() {
   this._changecb();
 }
 
-WymEtherpad.prototype.testGuiEvent = function() {
-  this.log("You clicked on the toolbar");
-};
-
 WymEtherpad.prototype.getUserList = function() {
   return this._client.getConnectedUsers();
 };
