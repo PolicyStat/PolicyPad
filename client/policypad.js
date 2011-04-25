@@ -204,6 +204,7 @@ function optimizeChangeset(oldText, changeset) {
   };
 
   var optimize = function(changeset) {
+    //console.log("--Begin Optimize--");
     parsed = parseChangeset(changeset);
     optimized = parsed.prefix;
     var pot = "";
@@ -211,16 +212,24 @@ function optimizeChangeset(oldText, changeset) {
     var text = oldText;
     
     for (var part = parsed.ops.next(); part != null; part = parsed.ops.next()) {
-      if (prevPart && part.op == '+') {
+      if (prevPart != null && part.op == '+') {
         textPart = text.substring(0, prevPart.len);
         potPart = parsed.bank.substring(0, part.len);
+        //console.log("Bank: " + parsed.bank);
         var i = textPart.length-1;
         var j = potPart.length-1;
         var newlines = 0;
-        for (; textPart[i] == potPart[j] && (i >= 0) && (j > 0); i--, j--)
-          if (textPart[i] == '\n')
+        //console.log(JSON.stringify({i: i, j: j}));
+        //console.log(JSON.stringify({textPart: textPart, potPart: potPart}));
+        while ((textPart.charAt(i) == potPart.charAt(j)) && (i >= 0) && (j > 0)) {
+          if (textPart.charAt(i) == '\n') {
             newlines++;
+          }
+          i--;
+          j--;
+        }
         len = textPart.length - 1 - i;
+        //console.log(JSON.stringify({i: i, j: j, len: len}));
         prevPart.len -= len;
         prevPart.newlines -= newlines;
         part.len -= len;
@@ -231,10 +240,12 @@ function optimizeChangeset(oldText, changeset) {
 
         i = 0;
         newlines = 0;
-        for (i = 0; textPart[i] == potPart[i] && (i < textPart.length) && (i < potPart.length); i++)
-          if (textPart[i] == '\n')
+        for (i = 0; textPart.charAt(i) == potPart.charAt(i) && (i < textPart.length) && (i < potPart.length); i++) {
+          if (textPart.charAt(i) == '\n')
             newlines++;
+        }
         if (i > 0) {
+          //console.log("big i");
           prevPart.len -= i;
           prevPart.newlines -= newlines;
           part.len -= i;
@@ -243,13 +254,15 @@ function optimizeChangeset(oldText, changeset) {
           optimized = append_part(optimized, newPart);
         }
 
-        if (prevPart.len)
+        if (prevPart.len > 0)
           optimized = append_part(optimized, prevPart);
         optimized = append_part(optimized, part);
-        if (newPartPost.len)
+        if (newPartPost.len > 0)
           optimized = append_part(optimized, newPartPost);
 
         pot += parsed.bank.substring(i, i + part.len);
+        //console.log(JSON.stringify({i: i, partlen: part.len}));
+        //console.log(pot);
         parsed.bank = parsed.bank.substring(i + part.len + len);
         prevPart = null;
       } else {
@@ -279,10 +292,15 @@ function optimizeChangeset(oldText, changeset) {
       optimized = append_part(optimized, prevPart);
     optimized += "$" + pot;
 
+    //console.log("--End Optimize--");
+
     return optimized;
   }
 
-  var optimizers = [collapse, optimize, collapse];
+  var optimizers = [
+                    collapse, 
+                    optimize,
+                    collapse];
   var origChangeset;
 
   do {
@@ -291,6 +309,7 @@ function optimizeChangeset(oldText, changeset) {
       changeset = optimizer(changeset);
     });
   } while (changeset != origChangeset);
+  //console.log(" ");
 
   return changeset;
 }
@@ -450,6 +469,7 @@ function generateChangeset(oldText, newText){
 
     if (applyChangeset(oldText, result) != newText) {
       func = alert;
+      //func = console.log;
         func("Changeset Generation Failed! Application yields '" + 
               applyChangeset(oldText, result) + "' instead of '" + newText + "'");
     }

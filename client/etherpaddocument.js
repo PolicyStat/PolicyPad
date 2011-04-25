@@ -43,7 +43,11 @@ function EtherpadDocument(funcHtml, funcXhtml, initialText) {
   //to manipulate both the text and the text/apool mappings.
   this._funcHtml(initialText.text);
   this._prevHtml = this._funcHtml();
-  this._prevXhtml = this._funcXhtml();
+  if (this._prevHtml == null)
+    alert("Previous Html is null");
+  this._prevXhtml = initialText.text;//this._funcXhtml();
+  if (this._prevXhtml == null)
+    alert("Previous XHtml is null");
   this._pendingChangeset = null;
 }
 
@@ -61,6 +65,8 @@ EtherpadDocument.prototype.applyChangeset = function(changeset, apool) {
     var newXhtml = applyChangeset(this._prevXhtml, changeset);
     this._funcHtml(newXhtml);
     this._prevHtml = this._funcHtml();
+  if (this._prevHtml == null)
+    alert("Previous Html is null");
     this._prevXhtml = newXhtml;
   }
   else {
@@ -78,8 +84,12 @@ EtherpadDocument.prototype.applyChangeset = function(changeset, apool) {
     //be able to grab both selections
     var oldXhtml = this._prevXhtml;
     this._prevXhtml = applyChangeset(this._prevXhtml, changeset);
+  if (this._prevXhtml == null)
+    alert("Previous XHtml is null");
     this._funcHtml(this._prevXhtml);
     this._prevHtml = this._funcHtml();
+  if (this._prevHtml == null)
+    alert("Previous Html is null");
 
     //4. Apply merged to current HTML
     var newXhtml = applyChangeset(oldXhtml, merged);
@@ -96,6 +106,8 @@ EtherpadDocument.prototype.hasPendingChangeset = function() {
 EtherpadDocument.prototype.changesetAccepted = function() {
   this._prevHtml = this._pendingHtml;
   this._prevXhtml = applyChangeset(this._prevXhtml, this._pendingChangeset);
+  if (this._prevXhtml == null)
+    alert("Previous XHtml is null");
   this._pendingChangeset = null;
 }
 

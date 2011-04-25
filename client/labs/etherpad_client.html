@@ -3,6 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>WYMeditor</title>
+<script type="text/javascript" src="../json2.js"></script>
 <!-- jQuery library is required, see http://jquery.com/ -->
 <script type="text/javascript" src="wymeditor/jquery/jquery.js"></script>
 <script type="text/javascript" src="../rangy/rangy-core.js"></script>
@@ -71,7 +72,7 @@ jQuery(function() {
         initialText: $_GET["initialText"],
 	username: $_GET["username"],
         funcLog: debug_log,
-        host: window.location.host,
+        host: window.location.host
       });
     }
   });
