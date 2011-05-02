@@ -80,3 +80,38 @@ the PolicyPad sytem.
 
 Hosting With a Proxy
 --------------------
+Remember, this set of steps for hosting EtherPad is unstable at this moment and
+will likely result in PolicyPad not working correctly. It is simply a starting
+point from which we hope to eventually develop a consistantly working solution.
+
+First, install the nginx webserver and git::
+
+    # aptitude install nginx git
+
+Now edit the system nginx configuration file (/etc/nginx/nginx.conf), adding the
+following section inside the default http section::
+
+    server {
+        listen       80;
+        server_name  your.domain;
+        root         /var/www/PolicyPad;
+ 
+    location /client {
+        
+    }
+ 
+    location / {
+        proxy_pass http://localhost:9000;
+        proxy_set_header Host $host;
+    }
+  }
+
+Now set up a location for the PolicyPad files inside your web root::
+
+    # cd /var/www
+    # git clone https://jetheis@github.com/jetheis/PolicyPad.git
+
+Finally, bring up both the nginx and EtherPad web services. EtherPad by default
+will serve on port 9000, and nginx will send all requests not to /client to it.
+EtherPad seems to work alright under these conditions, but PolicyPad does not
+seem to be able to connect or exchange data with EtherPad.
