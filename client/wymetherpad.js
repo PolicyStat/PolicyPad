@@ -88,6 +88,7 @@ WymEtherpad.prototype.connect = function() {
       colorId:   clientVars.userColor,
       userAgent: padutils.uaDisplay(clientVars.userAgent)
     };
+    //FIXME: unregister callbacks if etherpad._client already exists! 
     etherpad._client = getCollabClient(etherpad, clientVars.collab_client_vars, userInfo, { colorPalette: clientVars.colorPalette });
     etherpad._client.setOnUserJoin(          function(userInfo)               {etherpad.onUserJoin(userInfo);});
     etherpad._client.setOnUserLeave(         function(userInfo)               {etherpad.onUserLeave(userInfo);});

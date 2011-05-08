@@ -108,5 +108,61 @@ test('Inbound change with unprepared outbound change', function() {
   equal(func(), merged_html);
 });
 
+test('Inbound change with prepared outbound change', function() {
+  var old_html =       "<p>Hello World</p>";
+  var my_new_html =    "<p>Hello My World</p>";
+  var their_new_html = "<p>Hello World!</p>";
+  var merged_html =    "<p>Hello My World!</p>";
+  
+  var func = make_func(old_html);
+  var doc = new EtherpadDocument(func, make_no_set(func), {text: func() + "\n\n"});
+
+  //update our document
+  func(my_new_html);
+  equal(my_new_html, func());
+  
+  equal(doc.isModified(), true);
+  equal(doc.hasPendingChangeset(), false);
+
+  //generate a changeset, send it to the server
+  var changeset = doc.generateChangeset();
+  
+  equal(doc.isModified(), true);
+  equal(doc.hasPendingChangeset(), true);
+
+  //uhoh, changes are coming from the server too
+  var their_changeset = generateChangeset(old_html + "\n\n", their_new_html + "\n\n");
+  doc.applyChangeset(their_changeset);
+
+  equal(doc.isModified(), true);
+  equal(doc.hasPendingChangeset(), true);
+
+  //server accepted our changes
+  doc.changesetAccepted();
+
+  //make sure we are modified, _prevHtml has been updated, and our model has the
+  //merged changes
+  equal(func(), merged_html);
+  equal(doc.isModified(), true);
+  equal(doc.hasPendingChangeset(), false);
+  equal(doc._prevHtml, their_new_html + "\n\n");
+  equal(func(), merged_html);
+
+  //get a second changeset, make sure it brings us to merged_html
+  var second_changeset = doc.generateChangeset();
+  equal(doc.isModified(), true);
+  equal(doc.hasPendingChangeset(), true);
+  equal(applyChangeset(their_new_html + "\n\n", second_changeset), merged_html + "\n\n");
+  equal(doc._prevHtml, their_new_html + "\n\n");
+
+  //accept the second changeset
+  doc.changesetAccepted();
+  equal(doc.isModified(), false);
+  equal(doc.hasPendingChangeset(), false);
+  equal(doc._prevHtml, merged_html + "\n\n");
+  equal(func(), merged_html);
+});
+
+
 
 

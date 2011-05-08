@@ -110,15 +110,16 @@ function parseChangeset(changeset) {
 function applyChangeset(oldText, changeset) {
   var res = ''; 
   
-  var fail = function() {
+  var fail = function(msg) {
+    alert("applyChangeset failed: " + msg);
     return null;
   }
 
   parsed = parseChangeset(changeset);
   if (!parsed)
-    return fail();
+    return fail("!parsed");
   if (oldText.length != parsed.oldlen) {
-    return fail();
+    return fail("oldText.length(" + oldText.length + ") != parsed.oldlen(" + parsed.oldlen + ")");
   }
 
   //TODO: update attribs
@@ -128,7 +129,7 @@ function applyChangeset(oldText, changeset) {
       case '=':
         change = oldText.substring(i, i + part.len);
         if (change.split('\n').length-1 != part.newlines) {
-          return fail();
+          return fail("change.split('\n').length-1 != part.newlines");
         }
         res += change;
         i += part.len;
@@ -139,7 +140,7 @@ function applyChangeset(oldText, changeset) {
         break;
       case '-':
         if (oldText.substring(i, i + part.len).split('\n').length-1 != part.newlines) {
-          return fail();
+          return fail("oldText.substring(i, i + part.len");
         }
         i += part.len;
         break;
@@ -150,7 +151,7 @@ function applyChangeset(oldText, changeset) {
   res += oldText.substring(i);
 
   if (res.length != newlen) {
-    return fail();
+    return fail("res.length != newlen");
   }
 
   return res;
@@ -321,6 +322,9 @@ function optimizeChangeset(oldText, changeset) {
  * Based on John Resig's JavaScript diff algorithm
  */
 function generateChangeset(oldText, newText){
+
+  if (newText == null || oldText == null)
+    alert("Null text: ");
 
     function _newlines(t) {
         var newlines = t.match(/\n/g);
@@ -752,3 +756,4 @@ function mergeChangeset(base, cs1, cs2) {
 
   return optimizeChangeset(base, merged);
 }
+
