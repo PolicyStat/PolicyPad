@@ -151,7 +151,9 @@ WymEtherpad.prototype.setUserChangeNotificationCallback = function(cb) {
 
 WymEtherpad.prototype.prepareUserChangeset = function() {
   this.log("E: prepareUserChangeset()");
+  this._callbacks.saveSelection();
   changeset = this._doc.generateChangeset();
+  this._callbacks.restoreSelection();
   payload = {
     changeset: changeset,
     apool: {
@@ -166,7 +168,9 @@ WymEtherpad.prototype.prepareUserChangeset = function() {
 
 WymEtherpad.prototype.applyChangesToBase = function(changeset, author, apool) {
   this.log("applyChangesToBase(" + changeset + ", " + author + ", " + JSON.stringify(apool) + ")");
+  this._callbacks.saveSelection();
   this._doc.applyChangeset(changeset, apool);
+  this._callbacks.restoreSelection();
 }
 
 WymEtherpad.prototype.applyPreparedChangesetToBase = function() {

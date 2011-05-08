@@ -67,6 +67,17 @@ WymEtherpadGUI.prototype.html = function(val) {
     return this._wym.html().replace(/\r/g, "");
 
   //or set the value of the field, keeping the same selection
+  this._wym.html(val);
+}
+
+WymEtherpadGUI.prototype.saveSelection = function() {
+  var sel = this._wym.selection();
+  this._selection = rangy.serializeSelection(sel, true);
+  //this.status('selection: ' + this._selection);
+
+}
+
+WymEtherpadGUI.prototype.restoreSelection = function() {
   wym_window = function(wym) {
     var iframe = wym._iframe;
     var win = (iframe.contentDocument && iframe.contentDocument.defaultView) ?
@@ -74,17 +85,12 @@ WymEtherpadGUI.prototype.html = function(val) {
     return win;
   }
 
-  var sel = this._wym.selection();
   var win = wym_window(this._wym);
-  serialized = rangy.serializeSelection(sel, true);
-  //this.status('selection: ' + serialized);
-  this._wym.html(val);
-  if (sel) {
-    try {
-      rangy.deserializeSelection(serialized, undefined, win);
-    } catch (e) {
-      this.status("Failed to restore selection");
-    }
+
+  try {
+    rangy.deserializeSelection(this._selection, undefined, win);
+  } catch (e) {
+    this.status("Failed to restore selection");
   }
 }
 
