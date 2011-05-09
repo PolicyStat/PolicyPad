@@ -75,7 +75,7 @@ Then simply clone the PolicyPad repository::
     # git clone https://jetheis@github.com/jetheis/PolicyPad.git
 
 Now you should be able to browse to
-http://your.server/static/PolicyPad/client/labs/etherpad_laundher.html and use
+http://your.server/static/PolicyPad/client/labs/etherpad_launcher.html and use
 the PolicyPad sytem.
 
 Hosting With a Proxy
@@ -115,3 +115,29 @@ Finally, bring up both the nginx and EtherPad web services. EtherPad by default
 will serve on port 9000, and nginx will send all requests not to /client to it.
 EtherPad seems to work alright under these conditions, but PolicyPad does not
 seem to be able to connect or exchange data with EtherPad.
+
+Hosting on a Different Subdomain
+--------------------------------
+
+Hosting EtherPad on a different subdomain than the pages using PolicyPad is
+probably the best choice, as it allows more or less complete freedom in the
+location and URL structure of pages making use of PolicyPad. To set this up,
+first follow the instructions above for the pure EtherPad hosting style. You
+should configure this to exist on a subdomain of the site you plan on hosting
+your PolicyPad pages from.
+
+Once pure EtherPad on a subdomain is set up, the editor plugin using PolicyPad
+needs to be initialized with a different host than ``window.location``. This can
+be specified in the initialization options for WYMeditor::
+
+  jQuery('.wymeditor').wymeditor({ html: '',
+                                   postInit: function(wym) {
+                                       wym.etherpad({}, {padId: 'somepadid',
+                                                         initialText: 'sometext',
+                                                         username: 'someuser',
+                                                         host: 'myhost.mydomain'})
+                                       }
+                                   });
+
+Additional plugins written for other editors will need to support the ability to
+specify a different hostname, as seen here.
