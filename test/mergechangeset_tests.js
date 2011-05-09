@@ -56,7 +56,7 @@ test('addition and removal', function() {
   equals(applyChangeset('This s a sentence.', mergeChangeset('This s a sentence.', 'Z:i>7=9*0+7$simple ', 'Z:i>2=5-1*0+3$was')), 'This was a simple sentence.', 'This s a sentence./This was a simple sentence.');
   equals(applyChangeset('b hello world b', mergeChangeset('b hello world b', 'Z:f>7-1*0+8$b prefix', 'Z:f<6=8-7*0+1$b')), 'b prefix hello b', 'b hello world b/b prefix hello b');
   var changeset = mergeChangeset('xxxtxx\n\n', 'Z:8>1=4-1*0+2$xt', 'Z:8>1-1*0+2$xs');
-  equals(applyChangeset('xxxtxx\n\n', changeset), 'xxxtxx\n\n', 'xxxtxx/xsxxtxtx');
+  equals(applyChangeset('xxxtxx\n\n', changeset), 'xsxxtxtx\n\n', 'xxxtxx/xsxxtxtx');
 });
 
 test('non-overlapping merge', function() {
