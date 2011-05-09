@@ -20,6 +20,7 @@ Contents:
    :maxdepth: 2
 
    install
+   extending
    communication
    changesets
 
