@@ -239,7 +239,7 @@ WymEtherpad.prototype.onUpdateUserInfo = function(userInfo) {
 
 WymEtherpad.prototype.onChannelStateChange = function(channelState,	moreInfo) {
   this.log("onChannelStateChange(" + channelState + ", " + moreInfo + ")");
-  if (str == "DISCONNECTED") {
+  if (channelState == "DISCONNECTED") {
     this.connect();
   }
 }
