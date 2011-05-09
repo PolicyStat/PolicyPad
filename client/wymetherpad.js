@@ -29,6 +29,7 @@ function WymEtherpad(options, callbacks) {
   this._options = jQuery.extend(initial_options, options);
   this._callbacks = callbacks;
   this._initialized = false;
+  this._ace2editor = null;
 };
 
 //WymEtherpad initialization
@@ -88,8 +89,39 @@ WymEtherpad.prototype.connect = function() {
       colorId:   clientVars.userColor,
       userAgent: padutils.uaDisplay(clientVars.userAgent)
     };
-    //FIXME: unregister callbacks if etherpad._client already exists! 
-    etherpad._client = getCollabClient(etherpad, clientVars.collab_client_vars, userInfo, { colorPalette: clientVars.colorPalette });
+    if (etherpad._ace2editor) {
+      etherpad._ace2editor.enabled = false;
+      do_nothing = function() {};
+      etherpad._client.setOnUserJoin(do_nothing);
+      etherpad._client.setOnUserLeave(do_nothing);
+      etherpad._client.setOnUpdateUserInfo(do_nothing);
+      etherpad._client.setOnChannelStateChange(do_nothing);
+      etherpad._client.setOnClientMessage(do_nothing);
+      etherpad._client.setOnInternalAction(do_nothing);
+      etherpad._client.setOnConnectionTrouble(do_nothing);
+      etherpad._client.setOnServerMessage(do_nothing);
+    }
+    etherpad._ace2editor = (function() {
+      var callbacks = this;
+      this.enabled = true;
+      var wrap_call = function(func) {
+        return function() {
+          if (callbacks.enabled)
+            return func.apply(etherpad, arguments);
+          alert("Call aborted");
+        };
+      }
+      this.setProperty = wrap_call(etherpad.setProperty);
+      this.setBaseAttributedText = wrap_call(etherpad.setBaseAttributedText);
+      this.setUserChangeNotificationCallback = wrap_call(etherpad.setUserChangeNotificationCallback);
+      this.prepareUserChangeset = wrap_call(etherpad.prepareUserChangeset);
+      this.applyChangesToBase = wrap_call(etherpad.applyChangesToBase);
+      this.applyPreparedChangesetToBase = wrap_call(etherpad.applyPreparedChangesetToBase);
+      this.setAuthorInfo = wrap_call(etherpad.setAuthorInfo);
+      this.getUnhandledErrors = wrap_call(etherpad.getUnhandledErrors);
+      return this;
+    })();
+    etherpad._client = getCollabClient(etherpad._ace2editor, clientVars.collab_client_vars, userInfo, { colorPalette: clientVars.colorPalette });
     etherpad._client.setOnUserJoin(          function(userInfo)               {etherpad.onUserJoin(userInfo);});
     etherpad._client.setOnUserLeave(         function(userInfo)               {etherpad.onUserLeave(userInfo);});
     etherpad._client.setOnUpdateUserInfo(    function(userInfo)               {etherpad.onUpdateUserInfo(userInfo);});
