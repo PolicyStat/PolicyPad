@@ -117,6 +117,7 @@ EtherpadDocument.prototype.applyChangeset = function(changeset, apool) {
     this._prevXhtml = this._funcXhtml();
 
     this._funcHtml(newXhtml);
+    //alert('fanciful merge completed');
   } else if (isModified) {
     //We have local uncommitted changes, this merge is a bit complicated
 
@@ -139,6 +140,7 @@ EtherpadDocument.prototype.applyChangeset = function(changeset, apool) {
     if (newXhtml == null)
       alert("Failed to apply merged to oldXhtml");
     this._funcHtml(newXhtml);
+    //alert('not so fanciful merge completed');
   } else {
     //no need to merge changes, just apply the changeset to our base
     var newXhtml = applyChangeset(this._prevXhtml, changeset);

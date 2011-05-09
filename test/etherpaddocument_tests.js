@@ -300,3 +300,83 @@ test('Multiple inbound changes with prepared outbound change and local modificat
   equal(doc._prevHtml, merged_html + "\n\n");
 });
 
+test('Multiple unique inbound changes with prepared outbound change and local modifications', function() {
+  var old_html =          "xxxxx";
+  var my_new_html =       "xsxxxx";
+  var my_newer_html =     "xsxlxxx";
+  var their_new_html =    "xxxtxx";
+  var their_newer_html =  "xxxtxtx";
+  var new_server_base =   "xsxxtxx";
+  var newer_server_base = "xsxxtxtx";
+  var merged_html =       "xsxlxtxx";
+  var remerged_html =     "xsxlxtxtx";
+  
+  var func = make_func(old_html);
+  var doc = new EtherpadDocument(func, make_no_set(func), {text: func() + "\n\n"});
+
+  //1. Make some changes
+  func(my_new_html);
+  equal(my_new_html, func());
+  
+  equal(doc.isModified(), true);
+  equal(doc.hasPendingChangeset(), false);
+
+  //2. Submit those changes to the server.
+  var changeset = doc.generateChangeset();
+  
+  equal(applyChangeset(old_html + "\n\n", changeset), my_new_html + "\n\n");
+  equal(doc.isModified(), false);
+  equal(doc.hasPendingChangeset(), true);
+
+  //3. Make more changes
+  func(my_newer_html);
+  equal(my_newer_html, func());
+
+  equal(doc.isModified(), true);
+  equal(doc.hasPendingChangeset(), true);
+
+  //4.1. Receive changes from the server
+  var their_changeset = generateChangeset(old_html + "\n\n", their_new_html + "\n\n");
+  doc.applyChangeset(their_changeset);
+
+  equal(doc.isModified(), true);
+  equal(doc.hasPendingChangeset(), true);
+  equal(func(), merged_html);
+  equal(doc._prevHtml, their_new_html + "\n\n");
+  equal(doc._pendingHtml, new_server_base + "\n\n");
+  equal(applyChangeset(their_new_html + "\n\n", doc._pendingChangeset), new_server_base + "\n\n");
+
+  //4.2. Receive more changes from the server
+  var their_changeset = generateChangeset(their_new_html + "\n\n", their_newer_html + "\n\n");
+  doc.applyChangeset(their_changeset);
+
+  equal(doc.isModified(), true);
+  equal(doc.hasPendingChangeset(), true);
+  equal(func(), remerged_html);
+  equal(doc._prevHtml, their_newer_html + "\n\n");
+  equal(doc._pendingHtml, newer_server_base + "\n\n");
+  equal(applyChangeset(their_newer_html + "\n\n", doc._pendingChangeset), newer_server_base + "\n\n");
+
+  //5. Receive acceptance of changes from server
+  doc.changesetAccepted();
+
+  equal(doc.isModified(), true);
+  equal(doc.hasPendingChangeset(), false);
+  equal(func(), remerged_html);
+  equal(doc._prevHtml, newer_server_base + "\n\n");
+
+  //6. Send more local changes to the server
+  changeset = doc.generateChangeset();
+
+  equal(applyChangeset(newer_server_base + "\n\n", changeset), remerged_html + "\n\n");
+  equal(doc.isModified(), false);
+  equal(doc.hasPendingChangeset(), true);
+
+  //7. Receive acceptance of changes from server
+  doc.changesetAccepted();
+  equal(doc.isModified(), false);
+  equal(doc.hasPendingChangeset(), false);
+  equal(func(), remerged_html);
+  equal(doc._prevHtml, remerged_html + "\n\n");
+});
+
