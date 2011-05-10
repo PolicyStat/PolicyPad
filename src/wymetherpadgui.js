@@ -28,7 +28,6 @@ function WymEtherpadGUI(guioptions, options, wym) {
 
 //BEGIN WymEtherpadCallbacks interface
 // status(msg, persistent)
-// setTextEnabled(enabled)
 // html([val])
 // refreshUsers()
 
@@ -51,10 +50,6 @@ WymEtherpadGUI.prototype.status = function(msg, persistent) {
         etherpadgui._wym.status('');
     }, 5000);
   }
-}
-
-WymEtherpadGUI.prototype.setTextEnabled = function(enabled) {
-  //TODO: implement
 }
 
 WymEtherpadGUI.prototype.xhtml = function() {

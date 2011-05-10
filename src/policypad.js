@@ -236,8 +236,8 @@ function optimizeChangeset(oldText, changeset) {
         part.len -= len;
         part.newlines -= newlines;
         newPartPost = {op: '=', len: len, newlines: newlines, attribs: []};
-        textPart = textPart.substring(0, i);
-        potPart = potPart.substring(0, j);
+        textPart = textPart.substring(0, i+1);
+        potPart = potPart.substring(0, j+1);
 
         i = 0;
         newlines = 0;
@@ -253,10 +253,13 @@ function optimizeChangeset(oldText, changeset) {
           part.newlines -= newlines;
           newPart = {op: '=', len: i, newlines: newlines, attribs: []};
           optimized = append_part(optimized, newPart);
+          text = text.substring(newPart.len);
         }
 
-        if (prevPart.len > 0)
+        if (prevPart.len > 0) {
           optimized = append_part(optimized, prevPart);
+          text = text.substring(prevPart.len);
+        }
         optimized = append_part(optimized, part);
         if (newPartPost.len > 0)
           optimized = append_part(optimized, newPartPost);
@@ -303,16 +306,17 @@ function optimizeChangeset(oldText, changeset) {
                     optimize,
                     collapse];
   var origChangeset;
+  var newChangeset = changeset;
 
   do {
-    origChangeset = changeset;
+    origChangeset = newChangeset;
     jQuery.each(optimizers, function(i, optimizer) {
-      changeset = optimizer(changeset);
+      newChangeset = optimizer(newChangeset);
     });
-  } while (changeset != origChangeset);
+  } while (newChangeset != origChangeset);
   //console.log(" ");
 
-  return changeset;
+  return newChangeset;
 }
 
 /**

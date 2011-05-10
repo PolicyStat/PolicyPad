@@ -108,9 +108,8 @@ WymEtherpad.prototype.connect = function() {
         return function() {
           if (callbacks.enabled)
             return func.apply(etherpad, arguments);
-          alert("Call aborted");
         };
-      }
+      };
       this.setProperty = wrap_call(etherpad.setProperty);
       this.setBaseAttributedText = wrap_call(etherpad.setBaseAttributedText);
       this.setUserChangeNotificationCallback = wrap_call(etherpad.setUserChangeNotificationCallback);
