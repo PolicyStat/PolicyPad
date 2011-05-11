@@ -260,7 +260,8 @@ function optimizeChangeset(oldText, changeset) {
           optimized = append_part(optimized, prevPart);
           text = text.substring(prevPart.len);
         }
-        optimized = append_part(optimized, part);
+	if (part.len > 0)
+	  optimized = append_part(optimized, part);
         if (newPartPost.len > 0)
           optimized = append_part(optimized, newPartPost);
 
