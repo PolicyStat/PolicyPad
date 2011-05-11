@@ -75,7 +75,7 @@ Then simply clone the PolicyPad repository::
     # git clone https://jetheis@github.com/jetheis/PolicyPad.git
 
 Now you should be able to browse to
-http://your.server/static/PolicyPad/client/labs/etherpad_launcher.html and use
+http://your.server/static/demos/wymeditor/launcher.html and use
 the PolicyPad sytem.
 
 Hosting With a Proxy
@@ -114,7 +114,12 @@ Now set up a location for the PolicyPad files inside your web root::
 Finally, bring up both the nginx and EtherPad web services. EtherPad by default
 will serve on port 9000, and nginx will send all requests not to /client to it.
 EtherPad seems to work alright under these conditions, but PolicyPad does not
-seem to be able to connect or exchange data with EtherPad.
+seem to be able to connect or exchange data with EtherPad. There is a
+`StackOverflow question <http://stackoverflow.com/questions/1160454/nginx-proxy-to-comet>`_ 
+dealing with
+allowing Comet communication through Nginx, as well as an `Nginx module <http://pushmodule.slact.net/>`_ that sets up a simple Commet implementation. One
+of these is likely to yield a favorable result, once some more time is spent on
+it.
 
 Hosting on a Different Subdomain
 --------------------------------
