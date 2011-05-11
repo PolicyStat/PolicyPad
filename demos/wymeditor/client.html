@@ -58,6 +58,7 @@ var $_GET = getQueryParams(document.location.search);
 */
 
 jQuery(function() {
+  if ($_GET["debug"] != "on") jQuery("#debug-wrapper").html("");
   rangy.init();
   jQuery('.wymeditor').wymeditor({
     html: '', //This can override
@@ -69,8 +70,8 @@ jQuery(function() {
         //Options
         padId: $_GET["padId"],
         initialText: $_GET["initialText"],
-	username: $_GET["username"],
-        funcLog: debug_log,
+	    username: $_GET["username"],
+        funcLog: $_GET["debug"] == "on" ? debug_log : null,
         /* If you'd like to specify a different host for your EtherPad instance, do so here */
         host: window.location.host
       });
@@ -126,20 +127,16 @@ function btnRestore_onclick() {
 </head>
 
 <body onload="initialize();">
-<h1>WYMeditor/Etherpad Working Demo</h1>
+<h1>WYMeditor/PolicyPad Collaboration Demo</h1>
 <form method="post" action="">
 <textarea class="wymeditor">Loading...</textarea>
 <!--input type="submit" class="wymupdate" /-->
 <p> Connected Users: </p>
 <textarea id="userlist" rows="10" cols="40" value="Hello" readonly="true" class="wym_skin_default"></textarea>
 <br />
-<input type="button" name="btnRefresh" value="Refresh" onclick="btnRefresh_onclick()" />
-<br />
-<input type="button" name="btnSave" value="Save Selection" onclick="btnSave_onclick()" />
-<input type="button" name="btnRestore" value="Restore Selection" onclick="btnRestore_onclick()" />
 </form>
     
-Debug Output: <div id="debug"></div>
+<div id="debug-wrapper">Debug Output: <div id="debug"></div></div>
 
 </body>
 </html>

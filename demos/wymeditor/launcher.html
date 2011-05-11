@@ -8,11 +8,14 @@
 <body>
 <h1>WYMeditor/Etherpad Launcher</h1>
 <p>The purpose of this page is to initialize a WymEditor instance with data that
-would ideally come from database backend</p>
+would ideally come from database backend. This page will also initialize the PolicyPad
+library and establish a connection with EtherPad.</p>
 <form method="GET" action="client.html">
 Username:<br /><input type="text" name="username" value=""/><br />
-Pad ID:<br /><input type="text" name="padId" /><br />
-Initial HTML: <br /><textarea name="initialText" rows="13" cols="80"><p>Initial HTML</p></textarea>
+Pad ID (pad will be created if it does not exist):<br /><input type="text" name="padId" /><br />
+Initial HTML (will be used to initialize an empty pad): <br /><textarea name="initialText" rows="13" cols="80"><p>Initial HTML</p></textarea><br/>
+<input type="checkbox" name="debug"/>
+<label for="debug">Enable Debugging Output</label><br/><br/>
 <input type="submit" value="Launch WYMeditor" />
 </form>
 </body>
