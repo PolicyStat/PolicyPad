@@ -17,8 +17,7 @@ function WymEtherpadGUI(guioptions, options, wym) {
 
   // Automatically send changes
   // WymEtherpad should check to see if there are actually changes
-  setInterval(handleUIEvent, 250);
-  setInterval(handleUIEvent, 2000);
+  setInterval(handleUIEvent, 100);
 
   //register keyup handler
   //jQuery(this._doc).bind("keyup", handleUIEvent("keyup"));
