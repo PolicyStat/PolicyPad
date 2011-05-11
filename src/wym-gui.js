@@ -1,7 +1,7 @@
 
 function WymEtherpadGUI(guioptions, options, wym) {
   this._wym = wym
-  var etherpad = new WymEtherpad(options, this);
+  var etherpad = new PolicyPad(options, this);
   this._etherpad = etherpad;
   this._sel = null;
   //funcStatus: function(msg) { return wym.status(msg); },
